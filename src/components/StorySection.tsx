@@ -39,11 +39,12 @@ export function StorySection() {
         <div className="grid gap-16 md:grid-cols-2 md:items-center">
           <div>
             <p className="mb-3 text-sm font-medium tracking-widest text-primary">OUR STORY</p>
-            <h2 className="mb-6 text-3xl font-bold leading-snug text-foreground md:text-4xl">
+            <h2 className="mb-1 text-3xl font-bold leading-snug text-foreground md:text-4xl">
               {story.heading.split("\n").map((line, i) => (
                 <span key={i}>{i > 0 && <br />}{line}</span>
               ))}
             </h2>
+            <p className="mb-6 text-sm tracking-wide text-muted-foreground">Our Story</p>
             <p className="mb-6 leading-relaxed text-muted-foreground">{story.body1}</p>
             <p className="mb-8 leading-relaxed text-muted-foreground">{story.body2}</p>
             <Separator className="mb-8" />

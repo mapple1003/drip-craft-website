@@ -30,11 +30,12 @@ export function InstagramSection() {
         {/* Section header */}
         <div className="mb-12 text-center">
           <p className="mb-3 text-sm font-medium tracking-widest text-primary">INSTAGRAM</p>
-          <h2 className="mb-4 text-3xl font-bold text-foreground md:text-4xl">
+          <h2 className="mb-1 text-3xl font-bold text-foreground md:text-4xl">
             日々のコーヒーを
             <br className="sm:hidden" />
             シェアしています
           </h2>
+          <p className="mb-4 text-sm tracking-wide text-muted-foreground">Sharing Our Daily Coffee</p>
           <p className="text-muted-foreground">
             豆の産地、焙煎の様子、おすすめのドリップ方法など。
           </p>

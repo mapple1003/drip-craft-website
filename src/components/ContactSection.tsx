@@ -84,9 +84,10 @@ export function ContactSection() {
         {/* Section header */}
         <div className="mb-16 text-center">
           <p className="mb-3 text-sm font-medium tracking-widest text-primary">CONTACT</p>
-          <h2 className="mb-4 text-3xl font-bold text-foreground md:text-4xl">
+          <h2 className="mb-1 text-3xl font-bold text-foreground md:text-4xl">
             お問い合わせ
           </h2>
+          <p className="mb-4 text-sm tracking-wide text-muted-foreground">Contact Us</p>
           <p className="text-muted-foreground">
             ご質問・ギフトのご相談・まとめ買いのご依頼など、
             <br className="hidden sm:block" />

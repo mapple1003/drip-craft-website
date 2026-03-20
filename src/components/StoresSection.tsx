@@ -22,7 +22,8 @@ export function StoresSection() {
       <div className="mx-auto max-w-6xl">
         <div className="mb-16 text-center">
           <p className="mb-3 text-sm font-medium tracking-widest text-primary">WHERE TO BUY</p>
-          <h2 className="mb-4 text-3xl font-bold text-foreground md:text-4xl">取扱店舗</h2>
+          <h2 className="mb-1 text-3xl font-bold text-foreground md:text-4xl">取扱店舗</h2>
+          <p className="mb-4 text-sm tracking-wide text-muted-foreground">Where to Buy</p>
           <p className="text-muted-foreground">EKIREIのコーヒーをお取り扱いいただいている店舗です。</p>
         </div>
 

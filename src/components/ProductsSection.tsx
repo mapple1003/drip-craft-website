@@ -55,9 +55,10 @@ export function ProductsSection() {
       <div className="mx-auto max-w-6xl">
         <div className="mb-16 text-center">
           <p className="mb-3 text-sm font-medium tracking-widest text-primary">LINEUP</p>
-          <h2 className="mb-4 text-3xl font-bold text-foreground md:text-4xl">
+          <h2 className="mb-1 text-3xl font-bold text-foreground md:text-4xl">
             商品ラインナップ
           </h2>
+          <p className="mb-4 text-sm tracking-wide text-muted-foreground">Product Lineup</p>
           <p className="mx-auto max-w-md text-muted-foreground">
             地域の名所や自然からインスパイアされた、
             EKIREIオリジナルのドリップバッグコーヒーです。
