@@ -30,11 +30,12 @@ export function SiteHeader() {
           <Image
             src="/images/logo.png"
             alt="EKIREI"
-            width={120}
+            width={40}
             height={40}
             className="h-10 w-auto object-contain"
             priority
           />
+          <span className="text-xl font-bold tracking-widest text-primary">EKIREI</span>
         </a>
 
         {/* Desktop nav */}

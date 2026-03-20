@@ -20,13 +20,16 @@ export function SiteFooter() {
     <footer className="border-t bg-card px-6 py-12">
       <div className="mx-auto max-w-6xl">
         <div className="mb-8 flex flex-col items-center gap-4 text-center">
-          <Image
-            src="/images/logo.png"
-            alt="EKIREI"
-            width={120}
-            height={40}
-            className="h-10 w-auto object-contain"
-          />
+          <div className="flex items-center gap-2">
+            <Image
+              src="/images/logo.png"
+              alt="EKIREI"
+              width={40}
+              height={40}
+              className="h-10 w-auto object-contain"
+            />
+            <span className="text-xl font-bold tracking-widest text-primary">EKIREI</span>
+          </div>
           <p className="max-w-xs text-sm text-muted-foreground">
             厳選したスペシャルティコーヒーを、毎日の一杯に。
           </p>
