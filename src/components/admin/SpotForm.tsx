@@ -14,7 +14,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
-import { Loader2 } from "lucide-react";
+import { Loader2, Sparkles } from "lucide-react";
 
 const spotSchema = z.object({
   name: z.string().min(1, "入力してください"),
@@ -43,6 +43,7 @@ const LANG_FIELDS: { lang: string; flag: string; nameKey: StringField; descKey: 
 export function SpotForm({ spot }: { spot?: SpotDoc }) {
   const router = useRouter();
   const [isPending, setIsPending] = useState(false);
+  const [translating, setTranslating] = useState(false);
   const isEdit = !!spot;
 
   const form = useForm<SpotFormValues>({
@@ -61,6 +62,41 @@ export function SpotForm({ spot }: { spot?: SpotDoc }) {
       active: spot?.active ?? true,
     },
   });
+
+  const handleAutoTranslate = async () => {
+    const name = form.getValues("name");
+    const description = form.getValues("description");
+    if (!name && !description) {
+      toast.error("先に日本語の名所名と説明を入力してください");
+      return;
+    }
+    setTranslating(true);
+    try {
+      const [nameRes, descRes] = await Promise.all([
+        name ? fetch("/api/translate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ text: name, targets: ["EN-US", "ZH", "KO"] }),
+        }).then((r) => r.json()) : Promise.resolve({}),
+        description ? fetch("/api/translate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ text: description, targets: ["EN-US", "ZH", "KO"] }),
+        }).then((r) => r.json()) : Promise.resolve({}),
+      ]);
+      if (nameRes["EN-US"]) form.setValue("nameEn", nameRes["EN-US"]);
+      if (nameRes["ZH"]) form.setValue("nameZh", nameRes["ZH"]);
+      if (nameRes["KO"]) form.setValue("nameKo", nameRes["KO"]);
+      if (descRes["EN-US"]) form.setValue("descriptionEn", descRes["EN-US"]);
+      if (descRes["ZH"]) form.setValue("descriptionZh", descRes["ZH"]);
+      if (descRes["KO"]) form.setValue("descriptionKo", descRes["KO"]);
+      toast.success("翻訳が完了しました。内容を確認して保存してください。");
+    } catch {
+      toast.error("翻訳に失敗しました");
+    } finally {
+      setTranslating(false);
+    }
+  };
 
   const onSubmit = async (data: SpotFormValues) => {
     setIsPending(true);
@@ -116,6 +152,28 @@ export function SpotForm({ spot }: { spot?: SpotDoc }) {
             )} />
 
             <Separator />
+
+            {/* Auto translate button */}
+            <div className="flex items-center justify-between rounded-xl border border-primary/20 bg-primary/5 px-4 py-3">
+              <div>
+                <p className="text-sm font-medium text-foreground">自動翻訳（DeepL）</p>
+                <p className="text-xs text-muted-foreground">日本語の内容を英語・中文・韓国語に一括翻訳します</p>
+              </div>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                disabled={translating}
+                onClick={handleAutoTranslate}
+                className="shrink-0 border-primary/30 text-primary hover:bg-primary/5"
+              >
+                {translating ? (
+                  <><Loader2 size={14} className="animate-spin mr-1.5" />翻訳中...</>
+                ) : (
+                  <><Sparkles size={14} className="mr-1.5" />自動翻訳</>
+                )}
+              </Button>
+            </div>
 
             {/* Foreign languages */}
             {LANG_FIELDS.map(({ lang, flag, nameKey, descKey }) => (
