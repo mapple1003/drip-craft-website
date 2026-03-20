@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { AdminGuard } from "@/components/admin/AdminGuard";
 import { AdminNav } from "@/components/admin/AdminNav";
 import { getSiteContent, setSiteContent } from "@/lib/firestore";
-import type { SiteContentHero, SiteContentStory } from "@/types/admin";
+import type { SiteContentHero, SiteContentStory, SiteContentContact } from "@/types/admin";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -16,8 +16,10 @@ import { toast } from "sonner";
 export default function ContentPage() {
   const [hero, setHero] = useState<SiteContentHero | null>(null);
   const [story, setStory] = useState<SiteContentStory | null>(null);
+  const [contact, setContact] = useState<SiteContentContact | null>(null);
   const [savingHero, setSavingHero] = useState(false);
   const [savingStory, setSavingStory] = useState(false);
+  const [savingContact, setSavingContact] = useState(false);
 
   useEffect(() => {
     getSiteContent<SiteContentHero>("hero").then((data) => {
@@ -32,6 +34,15 @@ export default function ContentPage() {
         heading: "一杯のコーヒーに、\n想いを込めて。",
         body1: "EKIREI は、コーヒー好きが高じて始めた小さなブランドです。世界各地の農園を巡り、「これだ」と思える豆だけを仕入れ、一つひとつ丁寧にドリップバッグへと仕上げています。",
         body2: "忙しい朝でも、旅先でも、どこにいても本格的なコーヒーを楽しんでほしい——そんな想いからドリップバッグという形を選びました。",
+        updatedAt: new Date(),
+      });
+    });
+    getSiteContent<SiteContentContact>("contact").then((data) => {
+      setContact(data ?? {
+        email: "hello@ekirei.jp",
+        hours: "平日 10:00〜17:00",
+        hoursNote: "（土日祝は翌営業日対応）",
+        location: "東京都",
         updatedAt: new Date(),
       });
     });
@@ -63,6 +74,24 @@ export default function ContentPage() {
     }
   };
 
+  const saveContact = async () => {
+    if (!contact) return;
+    setSavingContact(true);
+    try {
+      await setSiteContent("contact", {
+        email: contact.email,
+        hours: contact.hours,
+        hoursNote: contact.hoursNote,
+        location: contact.location,
+      });
+      toast.success("お問い合わせ情報を保存しました");
+    } catch {
+      toast.error("保存に失敗しました");
+    } finally {
+      setSavingContact(false);
+    }
+  };
+
   return (
     <AdminGuard>
       <div className="flex h-dvh overflow-hidden">
@@ -73,6 +102,9 @@ export default function ContentPage() {
             <p className="text-muted-foreground">ヒーローとブランドストーリーの文章を編集</p>
           </div>
 
+          <div className="mb-4">
+            <p className="text-sm text-muted-foreground">サイト上部のヒーロー文章、ブランドストーリー、お問い合わせページの情報を編集できます。</p>
+          </div>
           <div className="flex max-w-2xl flex-col gap-8">
             {/* Hero */}
             <Card>
@@ -137,6 +169,50 @@ export default function ContentPage() {
                 </div>
                 <Button onClick={saveStory} disabled={savingStory} className="w-fit">
                   {savingStory ? <><Loader2 size={16} className="animate-spin mr-2" />保存中...</> : "保存する"}
+                </Button>
+              </CardContent>
+            </Card>
+            {/* Contact Info */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base">お問い合わせ情報</CardTitle>
+              </CardHeader>
+              <CardContent className="flex flex-col gap-4">
+                <div className="flex flex-col gap-1.5">
+                  <Label>メールアドレス</Label>
+                  <Input
+                    value={contact?.email ?? ""}
+                    onChange={(e) => setContact((c) => c ? { ...c, email: e.target.value } : null)}
+                    placeholder="hello@ekirei.jp"
+                  />
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <Label>対応時間</Label>
+                  <Input
+                    value={contact?.hours ?? ""}
+                    onChange={(e) => setContact((c) => c ? { ...c, hours: e.target.value } : null)}
+                    placeholder="平日 10:00〜17:00"
+                  />
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <Label>対応時間（補足）</Label>
+                  <Input
+                    value={contact?.hoursNote ?? ""}
+                    onChange={(e) => setContact((c) => c ? { ...c, hoursNote: e.target.value } : null)}
+                    placeholder="（土日祝は翌営業日対応）"
+                  />
+                  <p className="text-xs text-muted-foreground">空にすると非表示になります</p>
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <Label>所在地</Label>
+                  <Input
+                    value={contact?.location ?? ""}
+                    onChange={(e) => setContact((c) => c ? { ...c, location: e.target.value } : null)}
+                    placeholder="東京都"
+                  />
+                </div>
+                <Button onClick={saveContact} disabled={savingContact} className="w-fit">
+                  {savingContact ? <><Loader2 size={16} className="animate-spin mr-2" />保存中...</> : "保存する"}
                 </Button>
               </CardContent>
             </Card>

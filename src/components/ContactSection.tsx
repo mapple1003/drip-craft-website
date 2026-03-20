@@ -1,10 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
+import { getSiteContent } from "@/lib/firestore";
+import type { SiteContentContact } from "@/types/admin";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -27,6 +29,14 @@ const contactSchema = z.object({
 
 type ContactFormValues = z.infer<typeof contactSchema>;
 
+const DEFAULT_CONTACT_INFO: SiteContentContact = {
+  email: "hello@ekirei.jp",
+  hours: "平日 10:00〜17:00",
+  hoursNote: "（土日祝は翌営業日対応）",
+  location: "東京都",
+  updatedAt: new Date(),
+};
+
 async function submitContact(data: ContactFormValues): Promise<void> {
   const res = await fetch("/api/contact", {
     method: "POST",
@@ -41,6 +51,13 @@ async function submitContact(data: ContactFormValues): Promise<void> {
 
 export function ContactSection() {
   const [isPending, setIsPending] = useState(false);
+  const [info, setInfo] = useState<SiteContentContact>(DEFAULT_CONTACT_INFO);
+
+  useEffect(() => {
+    getSiteContent<SiteContentContact>("contact").then((data) => {
+      if (data) setInfo(data);
+    });
+  }, []);
 
   const form = useForm<ContactFormValues>({
     resolver: zodResolver(contactSchema),
@@ -89,7 +106,7 @@ export function ContactSection() {
               </div>
               <div>
                 <p className="mb-1 font-semibold text-foreground">メール</p>
-                <p className="text-sm text-muted-foreground">hello@ekirei.jp</p>
+                <p className="text-sm text-muted-foreground">{info.email}</p>
               </div>
             </div>
 
@@ -102,8 +119,10 @@ export function ContactSection() {
               </div>
               <div>
                 <p className="mb-1 font-semibold text-foreground">対応時間</p>
-                <p className="text-sm text-muted-foreground">平日 10:00〜17:00</p>
-                <p className="text-sm text-muted-foreground">（土日祝は翌営業日対応）</p>
+                <p className="text-sm text-muted-foreground">{info.hours}</p>
+                {info.hoursNote && (
+                  <p className="text-sm text-muted-foreground">{info.hoursNote}</p>
+                )}
               </div>
             </div>
 
@@ -116,7 +135,7 @@ export function ContactSection() {
               </div>
               <div>
                 <p className="mb-1 font-semibold text-foreground">所在地</p>
-                <p className="text-sm text-muted-foreground">東京都</p>
+                <p className="text-sm text-muted-foreground">{info.location}</p>
               </div>
             </div>
           </div>

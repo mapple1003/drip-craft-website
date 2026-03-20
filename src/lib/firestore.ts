@@ -13,7 +13,7 @@ import {
   Timestamp,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
-import type { ProductDoc, SiteContentHero, SiteContentStory, ContactDoc } from "@/types/admin";
+import type { ProductDoc, SiteContentHero, SiteContentStory, SiteContentContact, ContactDoc } from "@/types/admin";
 
 // --- Products ---
 
@@ -55,7 +55,7 @@ export async function deleteProduct(id: string): Promise<void> {
 
 // --- Site Content ---
 
-export async function getSiteContent<T>(section: "hero" | "story"): Promise<T | null> {
+export async function getSiteContent<T>(section: "hero" | "story" | "contact"): Promise<T | null> {
   const snap = await getDoc(doc(db, "siteContent", section));
   if (!snap.exists()) return null;
   const data = snap.data();
@@ -66,7 +66,7 @@ export async function getSiteContent<T>(section: "hero" | "story"): Promise<T | 
 }
 
 export async function setSiteContent(
-  section: "hero" | "story",
+  section: "hero" | "story" | "contact",
   data: Record<string, unknown>
 ): Promise<void> {
   await setDoc(

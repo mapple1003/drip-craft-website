@@ -24,6 +24,14 @@ export type SiteContentStory = {
   updatedAt: Date;
 };
 
+export type SiteContentContact = {
+  email: string;
+  hours: string;
+  hoursNote: string;
+  location: string;
+  updatedAt: Date;
+};
+
 export type ContactDoc = {
   id: string;
   name: string;
