@@ -13,7 +13,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Loader2 } from "lucide-react";
+import { Loader2, Languages } from "lucide-react";
+import { Separator } from "@/components/ui/separator";
 
 const productSchema = z.object({
   name: z.string().min(1, "入力してください"),
@@ -23,6 +24,10 @@ const productSchema = z.object({
   imageUrl: z.string().optional(),
   order: z.string(),
   active: z.boolean(),
+  // English fields (optional)
+  nameEn: z.string().optional(),
+  descriptionEn: z.string().optional(),
+  flavorEn: z.string().optional(),
 });
 
 type ProductFormValues = z.infer<typeof productSchema>;
@@ -46,6 +51,9 @@ export function ProductForm({ product }: Props) {
       imageUrl: product?.imageUrl ?? "",
       order: String(product?.order ?? 0),
       active: product?.active ?? true,
+      nameEn: product?.nameEn ?? "",
+      descriptionEn: product?.descriptionEn ?? "",
+      flavorEn: product?.flavorEn?.join(", ") ?? "",
     },
   });
 
@@ -60,6 +68,9 @@ export function ProductForm({ product }: Props) {
         imageUrl: data.imageUrl ?? "",
         order: Number(data.order),
         active: data.active,
+        nameEn: data.nameEn ?? "",
+        descriptionEn: data.descriptionEn ?? "",
+        flavorEn: data.flavorEn ? data.flavorEn.split(/[,，\s]+/).filter(Boolean) : [],
       };
 
       if (isEdit) {
@@ -165,6 +176,58 @@ export function ProductForm({ product }: Props) {
                   <p className="text-xs text-muted-foreground">
                     public/images/ に画像を置いた場合は /images/ファイル名 と入力してください
                   </p>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* English section */}
+            <Separator />
+            <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+              <Languages size={16} />
+              英語ページ用コンテンツ（任意）
+            </div>
+            <p className="text-xs text-muted-foreground -mt-3">
+              入力すると商品ページに「English」ボタンが表示されます
+            </p>
+
+            <FormField
+              control={form.control}
+              name="nameEn"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>商品名（英語）</FormLabel>
+                  <FormControl>
+                    <Input placeholder="e.g. Chibusan Blend" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="descriptionEn"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>説明文（英語）</FormLabel>
+                  <FormControl>
+                    <Textarea placeholder="e.g. A rich and smooth blend with a gentle aroma..." rows={3} {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="flavorEn"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>フレーバータグ（英語）</FormLabel>
+                  <FormControl>
+                    <Input placeholder="e.g. Smooth, Rich, Balanced (comma-separated)" {...field} />
+                  </FormControl>
                   <FormMessage />
                 </FormItem>
               )}

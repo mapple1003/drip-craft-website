@@ -8,7 +8,8 @@ import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton";
 import { getProducts } from "@/lib/firestore";
 import type { ProductDoc } from "@/types/admin";
-import { Coffee, Gift } from "lucide-react";
+import { Coffee } from "lucide-react";
+import Link from "next/link";
 
 function ProductImage({ src, alt }: { src?: string; alt: string }) {
   if (src) {
@@ -81,30 +82,31 @@ export function ProductsSection() {
         ) : (
           <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
             {products.map((product) => (
-              <Card key={product.id} className="group overflow-hidden transition-shadow hover:shadow-md">
-                <ProductImage src={product.imageUrl} alt={product.name} />
-                <CardHeader className="pb-2">
-                  <h3 className="font-bold text-foreground">{product.name}</h3>
-                  <p className="text-sm leading-relaxed text-muted-foreground">{product.description}</p>
-                </CardHeader>
-                <CardContent className="pb-2">
-                  <div className="flex flex-wrap gap-1.5">
-                    {product.flavor.map((f) => (
-                      <Badge key={f} variant="secondary" className="text-xs">{f}</Badge>
-                    ))}
-                  </div>
-                </CardContent>
-                <CardFooter className="flex items-center justify-between">
-                  <span className="text-lg font-bold text-foreground">
-                    ¥{product.price.toLocaleString("ja-JP")}
-                    <span className="text-xs font-normal text-muted-foreground"> /個</span>
-                  </span>
-                  {/* TODO(prod): Link to actual EC site or cart functionality */}
-                  <Button size="sm" variant="outline" className="border-primary/30 text-primary hover:bg-primary/5">
-                    購入
-                  </Button>
-                </CardFooter>
-              </Card>
+              <Link key={product.id} href={`/products/${product.id}`}>
+                <Card className="group h-full cursor-pointer overflow-hidden transition-shadow hover:shadow-md">
+                  <ProductImage src={product.imageUrl} alt={product.name} />
+                  <CardHeader className="pb-2">
+                    <h3 className="font-bold text-foreground">{product.name}</h3>
+                    <p className="text-sm leading-relaxed text-muted-foreground">{product.description}</p>
+                  </CardHeader>
+                  <CardContent className="pb-2">
+                    <div className="flex flex-wrap gap-1.5">
+                      {product.flavor.map((f) => (
+                        <Badge key={f} variant="secondary" className="text-xs">{f}</Badge>
+                      ))}
+                    </div>
+                  </CardContent>
+                  <CardFooter className="flex items-center justify-between">
+                    <span className="text-lg font-bold text-foreground">
+                      ¥{product.price.toLocaleString("ja-JP")}
+                      <span className="text-xs font-normal text-muted-foreground"> /個</span>
+                    </span>
+                    <Button size="sm" variant="outline" className="border-primary/30 text-primary hover:bg-primary/5" asChild>
+                      <span>詳細を見る</span>
+                    </Button>
+                  </CardFooter>
+                </Card>
+              </Link>
             ))}
           </div>
         )}

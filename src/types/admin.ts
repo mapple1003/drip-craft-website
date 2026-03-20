@@ -7,6 +7,10 @@ export type ProductDoc = {
   imageUrl: string;
   order: number;
   active: boolean;
+  // English content (optional)
+  nameEn?: string;
+  descriptionEn?: string;
+  flavorEn?: string[];
   createdAt: Date;
   updatedAt: Date;
 };

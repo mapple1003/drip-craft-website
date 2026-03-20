@@ -17,6 +17,18 @@ import type { ProductDoc, SiteContentHero, SiteContentStory, SiteContentContact,
 
 // --- Products ---
 
+export async function getProduct(id: string): Promise<ProductDoc | null> {
+  const snap = await getDoc(doc(db, "products", id));
+  if (!snap.exists()) return null;
+  const d = snap.data();
+  return {
+    id: snap.id,
+    ...(d as Omit<ProductDoc, "id" | "createdAt" | "updatedAt">),
+    createdAt: (d.createdAt as Timestamp)?.toDate() ?? new Date(),
+    updatedAt: (d.updatedAt as Timestamp)?.toDate() ?? new Date(),
+  };
+}
+
 export async function getProducts(): Promise<ProductDoc[]> {
   const q = query(collection(db, "products"), orderBy("order", "asc"));
   const snap = await getDocs(q);
