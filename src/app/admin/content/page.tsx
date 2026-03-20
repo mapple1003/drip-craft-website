@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { AdminGuard } from "@/components/admin/AdminGuard";
 import { AdminNav } from "@/components/admin/AdminNav";
 import { getSiteContent, setSiteContent } from "@/lib/firestore";
-import type { SiteContentHero, SiteContentStory, SiteContentContact } from "@/types/admin";
+import type { SiteContentHero, SiteContentStory, SiteContentContact, StoryValue } from "@/types/admin";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -25,6 +25,8 @@ export default function ContentPage() {
   const [savingContact, setSavingContact] = useState(false);
   const [uploadingHeroImage, setUploadingHeroImage] = useState(false);
   const [heroImageProgress, setHeroImageProgress] = useState(0);
+  const [uploadingStoryImage, setUploadingStoryImage] = useState(false);
+  const [storyImageProgress, setStoryImageProgress] = useState(0);
 
   useEffect(() => {
     getSiteContent<SiteContentHero>("hero").then((data) => {
@@ -39,6 +41,11 @@ export default function ContentPage() {
         heading: "一杯のコーヒーに、\n想いを込めて。",
         body1: "EKIREI は、コーヒー好きが高じて始めた小さなブランドです。世界各地の農園を巡り、「これだ」と思える豆だけを仕入れ、一つひとつ丁寧にドリップバッグへと仕上げています。",
         body2: "忙しい朝でも、旅先でも、どこにいても本格的なコーヒーを楽しんでほしい——そんな想いからドリップバッグという形を選びました。",
+        values: [
+          { title: "産地への敬意", description: "コーヒーの産地を訪れ、生産者と直接対話しながら豆を選びます。フェアな取引と持続可能な農業を支援しています。" },
+          { title: "丁寧な焙煎", description: "少量ずつ、豆の個性を最大限に引き出す焙煎プロファイルで仕上げます。注文後に焙煎することで、常に新鮮な状態でお届けします。" },
+          { title: "簡単・美味しい", description: "ドリップバッグだから、特別な器具は不要。マグカップにセットしてお湯を注ぐだけで、カフェクオリティのコーヒーが楽しめます。" },
+        ],
         updatedAt: new Date(),
       });
     });
@@ -113,13 +120,66 @@ export default function ContentPage() {
     if (!story) return;
     setSavingStory(true);
     try {
-      await setSiteContent("story", { heading: story.heading, body1: story.body1, body2: story.body2 });
+      await setSiteContent("story", {
+        heading: story.heading,
+        body1: story.body1,
+        body2: story.body2,
+        imageUrl: story.imageUrl ?? "",
+        values: story.values ?? [],
+      });
       toast.success("ブランドストーリーを保存しました");
     } catch {
       toast.error("保存に失敗しました");
     } finally {
       setSavingStory(false);
     }
+  };
+
+  const uploadStoryImage = async (file: File) => {
+    setUploadingStoryImage(true);
+    setStoryImageProgress(0);
+    try {
+      const storageRef = ref(storage, `story/story-image-${Date.now()}.${file.name.split(".").pop()}`);
+      const task = uploadBytesResumable(storageRef, file);
+      await new Promise<void>((resolve, reject) => {
+        task.on(
+          "state_changed",
+          (snap) => setStoryImageProgress(Math.round((snap.bytesTransferred / snap.totalBytes) * 100)),
+          reject,
+          resolve,
+        );
+      });
+      const url = await getDownloadURL(storageRef);
+      setStory((s) => s ? { ...s, imageUrl: url } : null);
+      toast.success("画像をアップロードしました。「保存する」を押して反映してください。");
+    } catch {
+      toast.error("画像のアップロードに失敗しました");
+    } finally {
+      setUploadingStoryImage(false);
+    }
+  };
+
+  const removeStoryImage = async () => {
+    if (!story?.imageUrl) return;
+    try {
+      if (story.imageUrl.includes("firebasestorage")) {
+        await deleteObject(ref(storage, story.imageUrl));
+      }
+      setStory((s) => s ? { ...s, imageUrl: "" } : null);
+      await setSiteContent("story", { heading: story.heading, body1: story.body1, body2: story.body2, imageUrl: "", values: story.values ?? [] });
+      toast.success("画像を削除しました");
+    } catch {
+      toast.error("削除に失敗しました");
+    }
+  };
+
+  const updateStoryValue = (index: number, field: keyof StoryValue, value: string) => {
+    setStory((s) => {
+      if (!s) return null;
+      const values = [...(s.values ?? [])];
+      values[index] = { ...values[index], [field]: value };
+      return { ...s, values };
+    });
   };
 
   const saveContact = async () => {
@@ -260,6 +320,73 @@ export default function ContentPage() {
                     onChange={(e) => setStory((s) => s ? { ...s, body2: e.target.value } : null)}
                   />
                 </div>
+
+                {/* Story image */}
+                <div className="flex flex-col gap-1.5">
+                  <Label>写真（右側に表示）</Label>
+                  {story?.imageUrl ? (
+                    <div className="relative w-48">
+                      <div className="relative aspect-square w-48 overflow-hidden rounded-xl border">
+                        <Image src={story.imageUrl} alt="ストーリー画像" fill className="object-cover" sizes="192px" />
+                      </div>
+                      <button
+                        type="button"
+                        onClick={removeStoryImage}
+                        className="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-destructive text-white shadow"
+                        aria-label="画像を削除"
+                      >
+                        <X size={12} />
+                      </button>
+                    </div>
+                  ) : (
+                    <label className="flex w-48 cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-border py-8 text-muted-foreground transition-colors hover:border-primary/50 hover:text-primary">
+                      {uploadingStoryImage ? (
+                        <>
+                          <Loader2 size={20} className="animate-spin" />
+                          <span className="text-xs">{storyImageProgress}%</span>
+                        </>
+                      ) : (
+                        <>
+                          <Upload size={20} />
+                          <span className="text-xs">写真を選択</span>
+                        </>
+                      )}
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        disabled={uploadingStoryImage}
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) uploadStoryImage(file);
+                        }}
+                      />
+                    </label>
+                  )}
+                  <p className="text-xs text-muted-foreground">正方形の写真がきれいに表示されます</p>
+                </div>
+
+                {/* Values */}
+                <div className="flex flex-col gap-3">
+                  <Label>こだわりポイント（3項目）</Label>
+                  {(story?.values ?? []).map((v, i) => (
+                    <div key={i} className="flex flex-col gap-2 rounded-lg border border-border p-3">
+                      <p className="text-xs font-medium text-muted-foreground">項目 {i + 1}</p>
+                      <Input
+                        value={v.title}
+                        onChange={(e) => updateStoryValue(i, "title", e.target.value)}
+                        placeholder="例：産地への敬意"
+                      />
+                      <Textarea
+                        rows={2}
+                        value={v.description}
+                        onChange={(e) => updateStoryValue(i, "description", e.target.value)}
+                        placeholder="説明文を入力..."
+                      />
+                    </div>
+                  ))}
+                </div>
+
                 <Button onClick={saveStory} disabled={savingStory} className="w-fit">
                   {savingStory ? <><Loader2 size={16} className="animate-spin mr-2" />保存中...</> : "保存する"}
                 </Button>

@@ -1,15 +1,18 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import { Separator } from "@/components/ui/separator";
 import { Leaf, Heart, Star } from "lucide-react";
 import { getSiteContent } from "@/lib/firestore";
 import type { SiteContentStory } from "@/types/admin";
 
-const values = [
-  { icon: Leaf, title: "産地への敬意", description: "コーヒーの産地を訪れ、生産者と直接対話しながら豆を選びます。フェアな取引と持続可能な農業を支援しています。" },
-  { icon: Heart, title: "丁寧な焙煎", description: "少量ずつ、豆の個性を最大限に引き出す焙煎プロファイルで仕上げます。注文後に焙煎することで、常に新鮮な状態でお届けします。" },
-  { icon: Star, title: "簡単・美味しい", description: "ドリップバッグだから、特別な器具は不要。マグカップにセットしてお湯を注ぐだけで、カフェクオリティのコーヒーが楽しめます。" },
+const ICONS = [Leaf, Heart, Star];
+
+const DEFAULT_VALUES = [
+  { title: "産地への敬意", description: "コーヒーの産地を訪れ、生産者と直接対話しながら豆を選びます。フェアな取引と持続可能な農業を支援しています。" },
+  { title: "丁寧な焙煎", description: "少量ずつ、豆の個性を最大限に引き出す焙煎プロファイルで仕上げます。注文後に焙煎することで、常に新鮮な状態でお届けします。" },
+  { title: "簡単・美味しい", description: "ドリップバッグだから、特別な器具は不要。マグカップにセットしてお湯を注ぐだけで、カフェクオリティのコーヒーが楽しめます。" },
 ];
 
 const DEFAULT_STORY: SiteContentStory = {
@@ -28,6 +31,8 @@ export function StorySection() {
     });
   }, []);
 
+  const values = story.values?.length ? story.values : DEFAULT_VALUES;
+
   return (
     <section id="story" className="px-6 py-24">
       <div className="mx-auto max-w-6xl">
@@ -43,31 +48,49 @@ export function StorySection() {
             <p className="mb-8 leading-relaxed text-muted-foreground">{story.body2}</p>
             <Separator className="mb-8" />
             <div className="flex flex-col gap-6">
-              {values.map((v) => (
-                <div key={v.title} className="flex gap-4">
-                  <div className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl" style={{ background: "oklch(0.60 0.09 162 / 0.12)" }}>
-                    <v.icon size={18} className="text-primary" />
+              {values.map((v, i) => {
+                const Icon = ICONS[i] ?? Leaf;
+                return (
+                  <div key={i} className="flex gap-4">
+                    <div className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl" style={{ background: "oklch(0.60 0.09 162 / 0.12)" }}>
+                      <Icon size={18} className="text-primary" />
+                    </div>
+                    <div>
+                      <p className="mb-1 font-semibold text-foreground">{v.title}</p>
+                      <p className="text-sm leading-relaxed text-muted-foreground">{v.description}</p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="mb-1 font-semibold text-foreground">{v.title}</p>
-                    <p className="text-sm leading-relaxed text-muted-foreground">{v.description}</p>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
 
+          {/* Right panel: photo or placeholder */}
           <div className="relative">
-            <div className="aspect-square rounded-3xl" style={{ background: "linear-gradient(135deg, oklch(0.60 0.09 162 / 0.15) 0%, oklch(0.42 0.13 310 / 0.15) 100%)" }}>
-              <div className="absolute inset-8 flex flex-col items-center justify-center gap-6 text-center">
-                <div className="text-8xl">☕</div>
-                <blockquote className="text-lg font-semibold italic leading-relaxed text-foreground/70">
-                  &ldquo;Good coffee is a pleasure.<br />Good friends are a treasure.&rdquo;
-                </blockquote>
-                <div className="h-px w-16" style={{ background: "oklch(0.60 0.09 162 / 0.4)" }} />
-                <p className="text-sm tracking-widest text-muted-foreground">EKIREI</p>
+            {story.imageUrl ? (
+              <div className="overflow-hidden rounded-3xl shadow-lg">
+                <div className="relative aspect-square w-full">
+                  <Image
+                    src={story.imageUrl}
+                    alt="ブランドストーリー"
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 90vw, 500px"
+                  />
+                </div>
               </div>
-            </div>
+            ) : (
+              <div className="aspect-square rounded-3xl" style={{ background: "linear-gradient(135deg, oklch(0.60 0.09 162 / 0.15) 0%, oklch(0.42 0.13 310 / 0.15) 100%)" }}>
+                <div className="absolute inset-8 flex flex-col items-center justify-center gap-6 text-center">
+                  <div className="text-8xl">☕</div>
+                  <blockquote className="text-lg font-semibold italic leading-relaxed text-foreground/70">
+                    &ldquo;Good coffee is a pleasure.<br />Good friends are a treasure.&rdquo;
+                  </blockquote>
+                  <div className="h-px w-16" style={{ background: "oklch(0.60 0.09 162 / 0.4)" }} />
+                  <p className="text-sm tracking-widest text-muted-foreground">EKIREI</p>
+                </div>
+              </div>
+            )}
             <div className="absolute -right-4 -top-4 flex flex-col items-center justify-center rounded-2xl px-4 py-3 text-center shadow-md" style={{ background: "#693c85", color: "white" }}>
               <span className="text-2xl font-bold">4</span>
               <span className="text-xs">フレーバー</span>

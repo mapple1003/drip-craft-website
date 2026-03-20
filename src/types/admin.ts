@@ -22,10 +22,17 @@ export type SiteContentHero = {
   updatedAt: Date;
 };
 
+export type StoryValue = {
+  title: string;
+  description: string;
+};
+
 export type SiteContentStory = {
   heading: string;
   body1: string;
   body2: string;
+  imageUrl?: string;
+  values?: StoryValue[];
   updatedAt: Date;
 };
 
