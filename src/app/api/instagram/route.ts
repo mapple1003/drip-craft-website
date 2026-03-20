@@ -24,7 +24,7 @@ export async function GET() {
     const data = await res.json();
 
     const posts: InstagramPost[] = (data.posts ?? [])
-      .slice(0, 9)
+      .slice(0, 3)
       .map((post: Record<string, unknown>) => {
         const sizes = post.sizes as Record<string, { mediaUrl: string }> | undefined;
         const imageUrl =

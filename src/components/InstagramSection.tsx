@@ -35,33 +35,29 @@ export function InstagramSection() {
         </div>
 
         {/* Photo grid */}
-        {loading ? (
-          <div className="mb-10 grid grid-cols-3 gap-3">
-            {[1, 2, 3, 4, 5, 6].map((i) => (
-              <Skeleton key={i} className="aspect-square rounded-2xl" />
-            ))}
-          </div>
-        ) : posts.length === 0 ? (
-          <div className="mb-10 grid grid-cols-2 gap-3 sm:grid-cols-3">
-            {/* Fallback placeholders */}
-            {[1, 2, 3, 4, 5, 6].map((i) => (
+        {/* Photo row — 3 posts, max ~180px each, centered */}
+        <div className="mb-10 flex justify-center gap-4">
+          {loading ? (
+            [1, 2, 3].map((i) => (
+              <Skeleton key={i} className="aspect-square w-40 shrink-0 rounded-2xl sm:w-48" />
+            ))
+          ) : posts.length === 0 ? (
+            [1, 2, 3].map((i) => (
               <div
                 key={i}
-                className="aspect-square rounded-2xl bg-gradient-to-br from-amber-100 to-orange-200 flex items-center justify-center"
+                className="aspect-square w-40 shrink-0 rounded-2xl bg-gradient-to-br from-amber-100 to-orange-200 flex items-center justify-center sm:w-48"
               >
-                <Instagram size={24} className="text-stone-400" />
+                <Instagram size={20} className="text-stone-400" />
               </div>
-            ))}
-          </div>
-        ) : (
-          <div className="mb-10 grid grid-cols-3 gap-3">
-            {posts.map((post) => (
+            ))
+          ) : (
+            posts.map((post) => (
               <a
                 key={post.id}
                 href={post.permalink}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group relative aspect-square overflow-hidden rounded-2xl"
+                className="group relative aspect-square w-40 shrink-0 overflow-hidden rounded-2xl sm:w-48"
                 aria-label={post.caption || "Instagram投稿"}
               >
                 <Image
@@ -69,19 +65,18 @@ export function InstagramSection() {
                   alt={post.caption || "Instagram投稿"}
                   fill
                   className="object-cover transition-transform duration-300 group-hover:scale-105"
-                  sizes="(max-width: 640px) 33vw, (max-width: 1024px) 25vw, 200px"
+                  sizes="192px"
                 />
-                {/* Hover overlay */}
                 <div className="absolute inset-0 flex items-center justify-center rounded-2xl bg-black/0 transition-colors group-hover:bg-black/25">
                   <Instagram
-                    size={24}
+                    size={20}
                     className="text-white opacity-0 drop-shadow transition-opacity group-hover:opacity-100"
                   />
                 </div>
               </a>
-            ))}
-          </div>
-        )}
+            ))
+          )}
+        </div>
 
         {/* CTA */}
         <div className="text-center">
