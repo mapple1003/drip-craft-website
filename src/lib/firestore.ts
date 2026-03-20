@@ -13,7 +13,7 @@ import {
   Timestamp,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
-import type { ProductDoc, SiteContentHero, SiteContentStory, SiteContentContact, SpotDoc, ContactDoc } from "@/types/admin";
+import type { ProductDoc, SiteContentHero, SiteContentStory, SiteContentContact, SiteContentSettings, StoreDoc, SpotDoc, ContactDoc } from "@/types/admin";
 
 // --- Products ---
 
@@ -86,6 +86,36 @@ export async function setSiteContent(
     { ...data, updatedAt: serverTimestamp() },
     { merge: true }
   );
+}
+
+// --- Stores ---
+
+export async function getStores(): Promise<StoreDoc[]> {
+  const q = query(collection(db, "stores"), orderBy("order", "asc"));
+  const snap = await getDocs(q);
+  return snap.docs.map((d) => ({
+    id: d.id,
+    ...(d.data() as Omit<StoreDoc, "id" | "createdAt" | "updatedAt">),
+    createdAt: (d.data().createdAt as Timestamp)?.toDate() ?? new Date(),
+    updatedAt: (d.data().updatedAt as Timestamp)?.toDate() ?? new Date(),
+  }));
+}
+
+export async function createStore(data: Omit<StoreDoc, "id" | "createdAt" | "updatedAt">): Promise<string> {
+  const ref = await addDoc(collection(db, "stores"), {
+    ...data,
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp(),
+  });
+  return ref.id;
+}
+
+export async function updateStore(id: string, data: Partial<Omit<StoreDoc, "id" | "createdAt" | "updatedAt">>): Promise<void> {
+  await updateDoc(doc(db, "stores", id), { ...data, updatedAt: serverTimestamp() });
+}
+
+export async function deleteStore(id: string): Promise<void> {
+  await deleteDoc(doc(db, "stores", id));
 }
 
 // --- Spots ---
