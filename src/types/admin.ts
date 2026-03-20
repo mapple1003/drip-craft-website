@@ -38,6 +38,8 @@ export type SiteContentStory = {
 
 export type SiteContentSettings = {
   instagramHandle: string;
+  instagramHeading?: string;
+  instagramDescription?: string;
   updatedAt: Date;
 };
 

@@ -13,6 +13,8 @@ export function InstagramSection() {
   const [posts, setPosts] = useState<InstagramPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [handle, setHandle] = useState("ekirei_219");
+  const [heading, setHeading] = useState("日々のコーヒーをシェアしています");
+  const [description, setDescription] = useState("豆の産地、焙煎の様子、おすすめのドリップ方法など。");
 
   useEffect(() => {
     fetch("/api/instagram")
@@ -21,6 +23,8 @@ export function InstagramSection() {
       .finally(() => setLoading(false));
     getSiteContent<SiteContentSettings>("settings").then((data) => {
       if (data?.instagramHandle) setHandle(data.instagramHandle);
+      if (data?.instagramHeading) setHeading(data.instagramHeading);
+      if (data?.instagramDescription) setDescription(data.instagramDescription);
     });
   }, []);
 
@@ -31,14 +35,10 @@ export function InstagramSection() {
         <div className="mb-12 text-center">
           <p className="mb-3 text-sm font-medium tracking-widest text-primary">INSTAGRAM</p>
           <h2 className="mb-1 text-3xl font-bold text-foreground md:text-4xl">
-            日々のコーヒーを
-            <br className="sm:hidden" />
-            シェアしています
+            {heading}
           </h2>
           <p className="mb-4 text-sm tracking-wide text-muted-foreground">Sharing Our Daily Coffee</p>
-          <p className="text-muted-foreground">
-            豆の産地、焙煎の様子、おすすめのドリップ方法など。
-          </p>
+          <p className="text-muted-foreground">{description}</p>
         </div>
 
         {/* Photo row — 3 posts, 1 row, responsive sizing */}

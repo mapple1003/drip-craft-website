@@ -191,7 +191,11 @@ export default function ContentPage() {
     if (!settings) return;
     setSavingSettings(true);
     try {
-      await setSiteContent("settings", { instagramHandle: settings.instagramHandle });
+      await setSiteContent("settings", {
+        instagramHandle: settings.instagramHandle,
+        instagramHeading: settings.instagramHeading ?? "",
+        instagramDescription: settings.instagramDescription ?? "",
+      });
       toast.success("設定を保存しました");
     } catch {
       toast.error("保存に失敗しました");
@@ -428,6 +432,22 @@ export default function ContentPage() {
                     />
                   </div>
                   <p className="text-xs text-muted-foreground">フッターとInstagramセクションのボタンに反映されます</p>
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <Label>Instagramセクション 見出し</Label>
+                  <Input
+                    value={settings?.instagramHeading ?? ""}
+                    onChange={(e) => setSettings((s) => s ? { ...s, instagramHeading: e.target.value } : null)}
+                    placeholder="日々のコーヒーをシェアしています"
+                  />
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <Label>Instagramセクション 説明文</Label>
+                  <Input
+                    value={settings?.instagramDescription ?? ""}
+                    onChange={(e) => setSettings((s) => s ? { ...s, instagramDescription: e.target.value } : null)}
+                    placeholder="豆の産地、焙煎の様子、おすすめのドリップ方法など。"
+                  />
                 </div>
                 <Button onClick={saveSettings} disabled={savingSettings} className="w-fit">
                   {savingSettings ? <><Loader2 size={16} className="animate-spin mr-2" />保存中...</> : "保存する"}
