@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import { Separator } from "@/components/ui/separator";
 import { Instagram } from "lucide-react";
 import { getSiteContent } from "@/lib/firestore";
@@ -19,7 +20,13 @@ export function SiteFooter() {
     <footer className="border-t bg-card px-6 py-12">
       <div className="mx-auto max-w-6xl">
         <div className="mb-8 flex flex-col items-center gap-4 text-center">
-          <span className="text-xl font-bold tracking-widest text-primary">EKIREI</span>
+          <Image
+            src="/images/logo.png"
+            alt="EKIREI"
+            width={120}
+            height={40}
+            className="h-10 w-auto object-contain"
+          />
           <p className="max-w-xs text-sm text-muted-foreground">
             厳選したスペシャルティコーヒーを、毎日の一杯に。
           </p>
