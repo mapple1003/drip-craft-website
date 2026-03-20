@@ -1,8 +1,39 @@
+import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
-import { products } from "@/data/products";
-import { Coffee } from "lucide-react";
+import { products, productSet } from "@/data/products";
+import { Coffee, Gift } from "lucide-react";
+
+type ProductImageProps = {
+  src?: string;
+  alt: string;
+  gradient: string;
+};
+
+function ProductImage({ src, alt, gradient }: ProductImageProps) {
+  if (src) {
+    return (
+      <div className="relative h-48 w-full overflow-hidden">
+        <Image
+          src={src}
+          alt={alt}
+          fill
+          className="object-cover transition-transform duration-300 group-hover:scale-105"
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+        />
+      </div>
+    );
+  }
+  // Fallback gradient while no photo is set
+  return (
+    <div className={`flex h-48 items-center justify-center bg-gradient-to-br ${gradient}`}>
+      <div className="flex h-20 w-20 items-center justify-center rounded-full bg-white/60 backdrop-blur-sm shadow-sm">
+        <Coffee size={36} className="text-stone-600" />
+      </div>
+    </div>
+  );
+}
 
 export function ProductsSection() {
   return (
@@ -15,8 +46,8 @@ export function ProductsSection() {
             商品ラインナップ
           </h2>
           <p className="mx-auto max-w-md text-muted-foreground">
-            世界各地から厳選したスペシャルティコーヒーを、
-            それぞれの個性を活かしてドリップバッグにしました。
+            地域の名所や自然からインスパイアされた、
+            EKIREIオリジナルのドリップバッグコーヒーです。
           </p>
         </div>
 
@@ -27,18 +58,11 @@ export function ProductsSection() {
               key={product.id}
               className="group overflow-hidden transition-shadow hover:shadow-md"
             >
-              {/* Product image area */}
-              <div
-                className={`relative flex h-48 items-center justify-center bg-gradient-to-br ${product.gradient}`}
-              >
-                <div className="flex h-20 w-20 items-center justify-center rounded-full bg-white/60 backdrop-blur-sm shadow-sm">
-                  <Coffee size={36} className="text-stone-600" />
-                </div>
-                {/* Origin badge */}
-                <span className="absolute bottom-3 right-3 rounded-full bg-white/80 px-2 py-0.5 text-[10px] font-medium text-stone-600 backdrop-blur-sm">
-                  {product.origin}
-                </span>
-              </div>
+              <ProductImage
+                src={product.image}
+                alt={product.name}
+                gradient={product.gradient}
+              />
 
               <CardHeader className="pb-2">
                 <h3 className="font-bold text-foreground">{product.name}</h3>
@@ -50,11 +74,7 @@ export function ProductsSection() {
               <CardContent className="pb-2">
                 <div className="flex flex-wrap gap-1.5">
                   {product.flavor.map((f) => (
-                    <Badge
-                      key={f}
-                      variant="secondary"
-                      className="text-xs"
-                    >
+                    <Badge key={f} variant="secondary" className="text-xs">
                       {f}
                     </Badge>
                   ))}
@@ -75,9 +95,53 @@ export function ProductsSection() {
           ))}
         </div>
 
+        {/* 4-variety set */}
+        <div className="mt-10">
+          <Card className="group overflow-hidden transition-shadow hover:shadow-md">
+            <div className="flex flex-col sm:flex-row">
+              <div className="relative sm:w-64 shrink-0">
+                <ProductImage
+                  src={productSet.image}
+                  alt={productSet.name}
+                  gradient={productSet.gradient}
+                />
+              </div>
+              <div className="flex flex-1 flex-col justify-between p-6">
+                <div>
+                  <div className="mb-2 flex items-center gap-2">
+                    <Gift size={18} className="text-accent" />
+                    <span className="text-sm font-medium text-accent">ギフトにもおすすめ</span>
+                  </div>
+                  <h3 className="mb-2 text-xl font-bold text-foreground">{productSet.name}</h3>
+                  <p className="mb-3 text-sm leading-relaxed text-muted-foreground">
+                    {productSet.description}
+                  </p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {productSet.contents.map((name) => (
+                      <Badge key={name} variant="secondary" className="text-xs">
+                        {name}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+                <div className="mt-4 flex items-center justify-between">
+                  <span className="text-2xl font-bold text-foreground">
+                    ¥{productSet.price.toLocaleString("ja-JP")}
+                    <span className="text-sm font-normal text-muted-foreground"> /セット</span>
+                  </span>
+                  {/* TODO(prod): Link to actual EC site or cart functionality */}
+                  <Button variant="outline" className="border-primary/30 text-primary hover:bg-primary/5">
+                    購入
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </Card>
+        </div>
+
         {/* CTA */}
-        <div className="mt-12 text-center">
-          <p className="mb-4 text-sm text-muted-foreground">
+        <div className="mt-10 text-center">
+          <p className="text-sm text-muted-foreground">
             まとめ買いや贈り物のご相談は
             <a href="#contact" className="ml-1 text-primary underline underline-offset-4">
               お問い合わせ
