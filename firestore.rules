@@ -2,13 +2,26 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // お問い合わせ: 誰でも書き込み可能（送信のみ）、読み込みは不可
+    // Products: anyone can read, only authenticated admin can write
+    match /products/{productId} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+
+    // Site content: anyone can read, only authenticated admin can write
+    match /siteContent/{section} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+
+    // Contacts: anyone can create, only authenticated admin can read
     match /contacts/{contactId} {
       allow create: if request.resource.data.keys().hasAll(['name', 'email', 'message', 'createdAt', 'updatedAt'])
         && request.resource.data.name is string
         && request.resource.data.email is string
         && request.resource.data.message is string;
-      allow read, update, delete: if false;
+      allow read: if request.auth != null;
+      allow update, delete: if false;
     }
   }
 }
