@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ArrowDown } from "lucide-react";
@@ -23,7 +24,8 @@ export function HeroSection() {
   }, []);
 
   return (
-    <section className="relative flex min-h-[85vh] flex-col items-center justify-center overflow-hidden px-6 py-24 text-center">
+    <section className="relative min-h-[85vh] overflow-hidden px-6 py-24">
+      {/* Background decorations */}
       <div
         className="pointer-events-none absolute inset-0 -z-10"
         style={{
@@ -37,38 +39,57 @@ export function HeroSection() {
         <div className="absolute bottom-[20%] left-[20%] h-16 w-16 rounded-full bg-primary/8" />
       </div>
 
-      <div className="animate-in fade-in slide-in-from-bottom-4 duration-700 max-w-2xl">
-        <Badge
-          className="mb-6 border-none px-4 py-1.5 text-xs tracking-widest"
-          style={{ background: "oklch(0.60 0.09 162 / 0.15)", color: "oklch(0.50 0.09 162)" }}
-        >
-          SPECIALTY COFFEE DRIP BAG
-        </Badge>
+      <div className="mx-auto flex max-w-6xl flex-col items-center gap-12 md:flex-row md:gap-16">
+        {/* Text */}
+        <div className="animate-in fade-in slide-in-from-bottom-4 duration-700 flex-1 text-center md:text-left">
+          <Badge
+            className="mb-6 border-none px-4 py-1.5 text-xs tracking-widest"
+            style={{ background: "oklch(0.60 0.09 162 / 0.15)", color: "oklch(0.50 0.09 162)" }}
+          >
+            SPECIALTY COFFEE DRIP BAG
+          </Badge>
 
-        <h1 className="mb-6 text-4xl font-bold leading-tight tracking-wide text-foreground md:text-6xl">
-          {hero.heading.split("\n").map((line, i) => (
-            <span key={i}>
-              {i === 0 ? line : <><br /><span className="text-primary">{line}</span></>}
-            </span>
-          ))}
-        </h1>
+          <h1 className="mb-6 text-4xl font-bold leading-tight tracking-wide text-foreground md:text-5xl lg:text-6xl">
+            {hero.heading.split("\n").map((line, i) => (
+              <span key={i}>
+                {i === 0 ? line : <><br /><span className="text-primary">{line}</span></>}
+              </span>
+            ))}
+          </h1>
 
-        <p className="mb-10 text-base leading-relaxed text-muted-foreground md:text-lg">
-          {hero.subheading.split("\n").map((line, i) => (
-            <span key={i}>{i > 0 && <br />}{line}</span>
-          ))}
-        </p>
+          <p className="mb-10 text-base leading-relaxed text-muted-foreground md:text-lg">
+            {hero.subheading.split("\n").map((line, i) => (
+              <span key={i}>{i > 0 && <br />}{line}</span>
+            ))}
+          </p>
 
-        <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
-          <a href="#products">
-            <Button size="lg" className="min-w-36 text-base">商品を見る</Button>
-          </a>
-          <a href="#story">
-            <Button size="lg" variant="outline" className="min-w-36 text-base border-primary/30 text-primary hover:bg-primary/5">
-              ブランドについて
-            </Button>
-          </a>
+          <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-center md:justify-start">
+            <a href="#products">
+              <Button size="lg" className="min-w-36 text-base">商品を見る</Button>
+            </a>
+            <a href="#story">
+              <Button size="lg" variant="outline" className="min-w-36 text-base border-primary/30 text-primary hover:bg-primary/5">
+                ブランドについて
+              </Button>
+            </a>
+          </div>
         </div>
+
+        {/* Hero image */}
+        {hero.imageUrl && (
+          <div className="animate-in fade-in duration-700 w-full max-w-sm md:max-w-md lg:max-w-lg shrink-0">
+            <div className="relative aspect-[4/5] w-full overflow-hidden rounded-3xl shadow-lg">
+              <Image
+                src={hero.imageUrl}
+                alt="EKIREI コーヒードリップバッグ"
+                fill
+                className="object-cover"
+                priority
+                sizes="(max-width: 768px) 90vw, 480px"
+              />
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce text-muted-foreground/40">

@@ -14,6 +14,7 @@ export type ProductDoc = {
 export type SiteContentHero = {
   heading: string;
   subheading: string;
+  imageUrl?: string;
   updatedAt: Date;
 };
 

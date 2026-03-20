@@ -10,8 +10,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Loader2 } from "lucide-react";
+import { Loader2, Upload, X } from "lucide-react";
 import { toast } from "sonner";
+import Image from "next/image";
+import { ref, uploadBytesResumable, getDownloadURL, deleteObject } from "firebase/storage";
+import { storage } from "@/lib/firebase";
 
 export default function ContentPage() {
   const [hero, setHero] = useState<SiteContentHero | null>(null);
@@ -20,6 +23,8 @@ export default function ContentPage() {
   const [savingHero, setSavingHero] = useState(false);
   const [savingStory, setSavingStory] = useState(false);
   const [savingContact, setSavingContact] = useState(false);
+  const [uploadingHeroImage, setUploadingHeroImage] = useState(false);
+  const [heroImageProgress, setHeroImageProgress] = useState(0);
 
   useEffect(() => {
     getSiteContent<SiteContentHero>("hero").then((data) => {
@@ -52,12 +57,55 @@ export default function ContentPage() {
     if (!hero) return;
     setSavingHero(true);
     try {
-      await setSiteContent("hero", { heading: hero.heading, subheading: hero.subheading });
+      await setSiteContent("hero", {
+        heading: hero.heading,
+        subheading: hero.subheading,
+        imageUrl: hero.imageUrl ?? "",
+      });
       toast.success("ヒーローセクションを保存しました");
     } catch {
       toast.error("保存に失敗しました");
     } finally {
       setSavingHero(false);
+    }
+  };
+
+  const uploadHeroImage = async (file: File) => {
+    setUploadingHeroImage(true);
+    setHeroImageProgress(0);
+    try {
+      const storageRef = ref(storage, `hero/hero-image-${Date.now()}.${file.name.split(".").pop()}`);
+      const task = uploadBytesResumable(storageRef, file);
+      await new Promise<void>((resolve, reject) => {
+        task.on(
+          "state_changed",
+          (snap) => setHeroImageProgress(Math.round((snap.bytesTransferred / snap.totalBytes) * 100)),
+          reject,
+          resolve,
+        );
+      });
+      const url = await getDownloadURL(storageRef);
+      setHero((h) => h ? { ...h, imageUrl: url } : null);
+      toast.success("画像をアップロードしました。「保存する」を押して反映してください。");
+    } catch {
+      toast.error("画像のアップロードに失敗しました");
+    } finally {
+      setUploadingHeroImage(false);
+    }
+  };
+
+  const removeHeroImage = async () => {
+    if (!hero?.imageUrl) return;
+    try {
+      // Only delete Storage file if it's a Firebase Storage URL
+      if (hero.imageUrl.includes("firebasestorage")) {
+        await deleteObject(ref(storage, hero.imageUrl));
+      }
+      setHero((h) => h ? { ...h, imageUrl: "" } : null);
+      await setSiteContent("hero", { heading: hero.heading, subheading: hero.subheading, imageUrl: "" });
+      toast.success("画像を削除しました");
+    } catch {
+      toast.error("削除に失敗しました");
     }
   };
 
@@ -131,6 +179,51 @@ export default function ContentPage() {
                     placeholder="説明文を入力..."
                   />
                 </div>
+                {/* Hero image upload */}
+                <div className="flex flex-col gap-1.5">
+                  <Label>ファーストビュー写真</Label>
+                  {hero?.imageUrl ? (
+                    <div className="relative w-48">
+                      <div className="relative aspect-[4/5] w-48 overflow-hidden rounded-xl border">
+                        <Image src={hero.imageUrl} alt="ヒーロー画像" fill className="object-cover" sizes="192px" />
+                      </div>
+                      <button
+                        type="button"
+                        onClick={removeHeroImage}
+                        className="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-destructive text-white shadow"
+                        aria-label="画像を削除"
+                      >
+                        <X size={12} />
+                      </button>
+                    </div>
+                  ) : (
+                    <label className="flex w-48 cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-border py-8 text-muted-foreground transition-colors hover:border-primary/50 hover:text-primary">
+                      {uploadingHeroImage ? (
+                        <>
+                          <Loader2 size={20} className="animate-spin" />
+                          <span className="text-xs">{heroImageProgress}%</span>
+                        </>
+                      ) : (
+                        <>
+                          <Upload size={20} />
+                          <span className="text-xs">写真を選択</span>
+                        </>
+                      )}
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        disabled={uploadingHeroImage}
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) uploadHeroImage(file);
+                        }}
+                      />
+                    </label>
+                  )}
+                  <p className="text-xs text-muted-foreground">推奨：縦長（4:5）の写真。右側に表示されます。</p>
+                </div>
+
                 <Button onClick={saveHero} disabled={savingHero} className="w-fit">
                   {savingHero ? <><Loader2 size={16} className="animate-spin mr-2" />保存中...</> : "保存する"}
                 </Button>
