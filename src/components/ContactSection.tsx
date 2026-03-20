@@ -5,6 +5,8 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
+import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { db } from "@/lib/firebase";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -28,17 +30,11 @@ const contactSchema = z.object({
 type ContactFormValues = z.infer<typeof contactSchema>;
 
 async function submitContact(data: ContactFormValues): Promise<void> {
-  // TODO(prod): Replace with actual Firestore write once Firebase is configured
-  // Example:
-  // const db = getFirestore();
-  // await addDoc(collection(db, "contacts"), {
-  //   ...data,
-  //   createdAt: serverTimestamp(),
-  //   updatedAt: serverTimestamp(),
-  // });
-
-  // Simulate network delay for now
-  await new Promise((resolve) => setTimeout(resolve, 1000));
+  await addDoc(collection(db, "contacts"), {
+    ...data,
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp(),
+  });
 }
 
 export function ContactSection() {
