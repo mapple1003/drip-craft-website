@@ -92,10 +92,6 @@ export function StorySection() {
                 </div>
               </div>
             )}
-            <div className="absolute -right-4 -top-4 flex flex-col items-center justify-center rounded-2xl px-4 py-3 text-center shadow-md" style={{ background: "#693c85", color: "white" }}>
-              <span className="text-2xl font-bold">4</span>
-              <span className="text-xs">フレーバー</span>
-            </div>
           </div>
         </div>
       </div>
