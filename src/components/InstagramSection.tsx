@@ -66,7 +66,7 @@ export function InstagramSection() {
           >
             <Button variant="outline" className="gap-2 border-primary/30 text-primary hover:bg-primary/5">
               <Instagram size={16} />
-              @dripcraftcoffee をフォロー
+              @ekirei_coffee をフォロー
             </Button>
           </a>
         </div>

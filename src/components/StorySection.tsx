@@ -34,7 +34,7 @@ export function StorySection() {
             </h2>
 
             <p className="mb-6 leading-relaxed text-muted-foreground">
-              DRIP CRAFT は、コーヒー好きが高じて始めた小さなブランドです。
+              EKIREI は、コーヒー好きが高じて始めた小さなブランドです。
               世界各地の農園を巡り、「これだ」と思える豆だけを仕入れ、
               一つひとつ丁寧にドリップバッグへと仕上げています。
             </p>
@@ -88,7 +88,7 @@ export function StorySection() {
                   style={{ background: "oklch(0.60 0.09 162 / 0.4)" }}
                 />
                 <p className="text-sm tracking-widest text-muted-foreground">
-                  DRIP CRAFT
+                  EKIREI
                 </p>
               </div>
             </div>

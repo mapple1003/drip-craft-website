@@ -87,7 +87,7 @@ export function ContactSection() {
               </div>
               <div>
                 <p className="mb-1 font-semibold text-foreground">メール</p>
-                <p className="text-sm text-muted-foreground">hello@dripcraft.jp</p>
+                <p className="text-sm text-muted-foreground">hello@ekirei.jp</p>
               </div>
             </div>
 

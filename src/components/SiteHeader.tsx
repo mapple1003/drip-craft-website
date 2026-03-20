@@ -27,7 +27,7 @@ export function SiteHeader() {
         {/* Logo */}
         <a href="#" className="flex items-center gap-2">
           <span className="text-xl font-bold tracking-widest text-primary">
-            DRIP CRAFT
+            EKIREI
           </span>
         </a>
 

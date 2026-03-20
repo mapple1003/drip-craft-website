@@ -16,7 +16,7 @@ const notoSansJP = Noto_Sans_JP({
 });
 
 export const metadata: Metadata = {
-  title: "DRIP CRAFT | オリジナルコーヒードリップバッグ",
+  title: "EKIREI | オリジナルコーヒードリップバッグ",
   description: "厳選した豆を丁寧に詰めたオリジナルコーヒードリップバッグ。自宅でカフェの味を。",
 };
 
