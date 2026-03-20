@@ -1,18 +1,22 @@
-import { Button } from "@/components/ui/button";
-import { Instagram } from "lucide-react";
+"use client";
 
-// Placeholder grid items representing Instagram posts
-const placeholderPosts = [
-  { id: 1, gradient: "from-amber-100 to-orange-200", emoji: "☕" },
-  { id: 2, gradient: "from-teal-100 to-emerald-200", emoji: "🌿" },
-  { id: 3, gradient: "from-rose-100 to-pink-200", emoji: "☕" },
-  { id: 4, gradient: "from-stone-100 to-amber-200", emoji: "📦" },
-  { id: 5, gradient: "from-purple-100 to-violet-200", emoji: "✨" },
-  { id: 6, gradient: "from-sky-100 to-blue-200", emoji: "☕" },
-];
+import { useEffect, useState } from "react";
+import Image from "next/image";
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Instagram } from "lucide-react";
+import type { InstagramPost } from "@/app/api/instagram/route";
 
 export function InstagramSection() {
-  // TODO(prod): Replace placeholder grid with real Instagram Basic Display API or oEmbed feed
+  const [posts, setPosts] = useState<InstagramPost[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch("/api/instagram")
+      .then((r) => r.json())
+      .then((data) => setPosts(data.posts ?? []))
+      .finally(() => setLoading(false));
+  }, []);
 
   return (
     <section id="instagram" className="bg-muted/40 px-6 py-24">
@@ -30,43 +34,65 @@ export function InstagramSection() {
           </p>
         </div>
 
-        {/* Instagram photo grid */}
-        <div className="mb-10 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-          {placeholderPosts.map((post) => (
-            <a
-              key={post.id}
-              href="#"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group relative aspect-square overflow-hidden rounded-2xl"
-              aria-label={`Instagram投稿 ${post.id}`}
-            >
+        {/* Photo grid */}
+        {loading ? (
+          <div className="mb-10 grid grid-cols-3 gap-3">
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <Skeleton key={i} className="aspect-square rounded-2xl" />
+            ))}
+          </div>
+        ) : posts.length === 0 ? (
+          <div className="mb-10 grid grid-cols-2 gap-3 sm:grid-cols-3">
+            {/* Fallback placeholders */}
+            {[1, 2, 3, 4, 5, 6].map((i) => (
               <div
-                className={`absolute inset-0 bg-gradient-to-br ${post.gradient} transition-transform duration-300 group-hover:scale-105`}
-              />
-              <div className="absolute inset-0 flex items-center justify-center text-4xl">
-                {post.emoji}
+                key={i}
+                className="aspect-square rounded-2xl bg-gradient-to-br from-amber-100 to-orange-200 flex items-center justify-center"
+              >
+                <Instagram size={24} className="text-stone-400" />
               </div>
-              <div className="absolute inset-0 flex items-center justify-center rounded-2xl bg-black/0 transition-colors group-hover:bg-black/10">
-                <Instagram
-                  size={24}
-                  className="text-white opacity-0 drop-shadow transition-opacity group-hover:opacity-100"
+            ))}
+          </div>
+        ) : (
+          <div className="mb-10 grid grid-cols-3 gap-3">
+            {posts.map((post) => (
+              <a
+                key={post.id}
+                href={post.permalink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group relative aspect-square overflow-hidden rounded-2xl"
+                aria-label={post.caption || "Instagram投稿"}
+              >
+                <Image
+                  src={post.imageUrl}
+                  alt={post.caption || "Instagram投稿"}
+                  fill
+                  className="object-cover transition-transform duration-300 group-hover:scale-105"
+                  sizes="(max-width: 640px) 33vw, (max-width: 1024px) 25vw, 200px"
                 />
-              </div>
-            </a>
-          ))}
-        </div>
+                {/* Hover overlay */}
+                <div className="absolute inset-0 flex items-center justify-center rounded-2xl bg-black/0 transition-colors group-hover:bg-black/25">
+                  <Instagram
+                    size={24}
+                    className="text-white opacity-0 drop-shadow transition-opacity group-hover:opacity-100"
+                  />
+                </div>
+              </a>
+            ))}
+          </div>
+        )}
 
         {/* CTA */}
         <div className="text-center">
           <a
-            href="https://instagram.com"
+            href="https://instagram.com/ekirei_219"
             target="_blank"
             rel="noopener noreferrer"
           >
             <Button variant="outline" className="gap-2 border-primary/30 text-primary hover:bg-primary/5">
               <Instagram size={16} />
-              @ekirei_coffee をフォロー
+              @ekirei_219 をフォロー
             </Button>
           </a>
         </div>
