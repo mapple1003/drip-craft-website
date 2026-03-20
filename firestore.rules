@@ -14,6 +14,12 @@ service cloud.firestore {
       allow write: if request.auth != null;
     }
 
+    // Spots: anyone can read, only authenticated admin can write
+    match /spots/{spotId} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+
     // Contacts: anyone can create, only authenticated admin can read
     match /contacts/{contactId} {
       allow create: if request.resource.data.keys().hasAll(['name', 'email', 'message', 'createdAt', 'updatedAt'])

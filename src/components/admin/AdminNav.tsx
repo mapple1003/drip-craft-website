@@ -6,13 +6,14 @@ import { signOut } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { LayoutDashboard, Package, FileText, Mail, LogOut } from "lucide-react";
+import { LayoutDashboard, Package, FileText, Mail, QrCode, LogOut } from "lucide-react";
 import { toast } from "sonner";
 
 const navItems = [
   { href: "/admin/dashboard", label: "ダッシュボード", icon: LayoutDashboard },
   { href: "/admin/products", label: "商品管理", icon: Package },
   { href: "/admin/content", label: "サイト文章", icon: FileText },
+  { href: "/admin/spots", label: "名所ページ", icon: QrCode },
   { href: "/admin/contacts", label: "お問い合わせ", icon: Mail },
 ];
 

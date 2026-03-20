@@ -13,7 +13,7 @@ import {
   Timestamp,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
-import type { ProductDoc, SiteContentHero, SiteContentStory, SiteContentContact, ContactDoc } from "@/types/admin";
+import type { ProductDoc, SiteContentHero, SiteContentStory, SiteContentContact, SpotDoc, ContactDoc } from "@/types/admin";
 
 // --- Products ---
 
@@ -86,6 +86,46 @@ export async function setSiteContent(
     { ...data, updatedAt: serverTimestamp() },
     { merge: true }
   );
+}
+
+// --- Spots ---
+
+function toSpotDoc(id: string, d: Record<string, unknown>): SpotDoc {
+  return {
+    id,
+    ...(d as Omit<SpotDoc, "id" | "createdAt" | "updatedAt">),
+    createdAt: (d.createdAt as Timestamp)?.toDate() ?? new Date(),
+    updatedAt: (d.updatedAt as Timestamp)?.toDate() ?? new Date(),
+  };
+}
+
+export async function getSpots(): Promise<SpotDoc[]> {
+  const q = query(collection(db, "spots"), orderBy("order", "asc"));
+  const snap = await getDocs(q);
+  return snap.docs.map((d) => toSpotDoc(d.id, d.data() as Record<string, unknown>));
+}
+
+export async function getSpot(id: string): Promise<SpotDoc | null> {
+  const snap = await getDoc(doc(db, "spots", id));
+  if (!snap.exists()) return null;
+  return toSpotDoc(snap.id, snap.data() as Record<string, unknown>);
+}
+
+export async function createSpot(data: Omit<SpotDoc, "id" | "createdAt" | "updatedAt">): Promise<string> {
+  const ref = await addDoc(collection(db, "spots"), {
+    ...data,
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp(),
+  });
+  return ref.id;
+}
+
+export async function updateSpot(id: string, data: Partial<Omit<SpotDoc, "id" | "createdAt" | "updatedAt">>): Promise<void> {
+  await updateDoc(doc(db, "spots", id), { ...data, updatedAt: serverTimestamp() });
+}
+
+export async function deleteSpot(id: string): Promise<void> {
+  await deleteDoc(doc(db, "spots", id));
 }
 
 // --- Contacts ---

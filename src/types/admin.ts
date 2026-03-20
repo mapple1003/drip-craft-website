@@ -44,6 +44,23 @@ export type SiteContentContact = {
   updatedAt: Date;
 };
 
+export type SpotDoc = {
+  id: string;
+  name: string;
+  description: string;
+  nameEn?: string;
+  descriptionEn?: string;
+  nameZh?: string;
+  descriptionZh?: string;
+  nameKo?: string;
+  descriptionKo?: string;
+  imageUrl?: string;
+  active: boolean;
+  order: number;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
 export type ContactDoc = {
   id: string;
   name: string;
