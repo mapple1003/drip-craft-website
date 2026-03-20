@@ -5,7 +5,7 @@ export type Product = {
   flavor: string[];
   price: number;
   gradient: string;
-  image?: string; // Optional product photo path (e.g. "/images/product-chibusanblend.jpg")
+  image?: string; // Optional product photo path (e.g. "/images/product-chibusanblend.png")
 };
 
 export const products: Product[] = [
@@ -16,7 +16,7 @@ export const products: Product[] = [
     flavor: ["まろやか", "コク", "バランス"],
     price: 500,
     gradient: "from-amber-100 to-orange-200",
-    image: "/images/product-chibusanblend.jpg",
+    image: "/images/product-chibusanblend.png",
   },
   {
     id: "fudoiwa",
@@ -25,7 +25,7 @@ export const products: Product[] = [
     flavor: ["力強い", "深み", "ビター"],
     price: 500,
     gradient: "from-stone-200 to-amber-300",
-    image: "/images/product-fudoiwa.jpg",
+    image: "/images/product-fudoiwa.png",
   },
   {
     id: "aira-tobikatura",
@@ -34,7 +34,7 @@ export const products: Product[] = [
     flavor: ["華やか", "甘み", "フローラル"],
     price: 500,
     gradient: "from-rose-100 to-pink-200",
-    image: "/images/product-aira-tobikatura.jpg",
+    image: "/images/product-aira-tobikatura.png",
   },
   {
     id: "sakurayu",
@@ -43,7 +43,7 @@ export const products: Product[] = [
     flavor: ["やさしい", "すっきり", "ほんのり甘い"],
     price: 500,
     gradient: "from-pink-100 to-rose-200",
-    image: "/images/product-sakurayu.jpg",
+    image: "/images/product-sakurayu.png",
   },
 ];
 
@@ -55,5 +55,5 @@ export const productSet = {
   contents: products.map((p) => p.name),
   price: 1800,
   gradient: "from-teal-100 to-emerald-200",
-  image: "/images/product-set.jpg",
+  image: "/images/product-set.png",
 };
