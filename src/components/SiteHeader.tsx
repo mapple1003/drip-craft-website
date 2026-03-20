@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Menu } from "lucide-react";
@@ -26,9 +27,14 @@ export function SiteHeader() {
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
         {/* Logo */}
         <a href="#" className="flex items-center gap-2">
-          <span className="text-xl font-bold tracking-widest text-primary">
-            EKIREI
-          </span>
+          <Image
+            src="/images/logo.png"
+            alt="EKIREI"
+            width={120}
+            height={40}
+            className="h-10 w-auto object-contain"
+            priority
+          />
         </a>
 
         {/* Desktop nav */}
