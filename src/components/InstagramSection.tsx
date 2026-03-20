@@ -34,18 +34,17 @@ export function InstagramSection() {
           </p>
         </div>
 
-        {/* Photo grid */}
-        {/* Photo row — 3 posts, max ~180px each, centered */}
-        <div className="mb-10 flex justify-center gap-4">
+        {/* Photo row — 3 posts, 1 row, responsive sizing */}
+        <div className="mb-10 flex justify-center gap-3 sm:gap-4">
           {loading ? (
             [1, 2, 3].map((i) => (
-              <Skeleton key={i} className="aspect-square w-40 shrink-0 rounded-2xl sm:w-48" />
+              <Skeleton key={i} className="aspect-square w-[28vw] max-w-[200px] rounded-2xl" />
             ))
           ) : posts.length === 0 ? (
             [1, 2, 3].map((i) => (
               <div
                 key={i}
-                className="aspect-square w-40 shrink-0 rounded-2xl bg-gradient-to-br from-amber-100 to-orange-200 flex items-center justify-center sm:w-48"
+                className="aspect-square w-[28vw] max-w-[200px] shrink-0 rounded-2xl bg-gradient-to-br from-amber-100 to-orange-200 flex items-center justify-center"
               >
                 <Instagram size={20} className="text-stone-400" />
               </div>
@@ -57,7 +56,7 @@ export function InstagramSection() {
                 href={post.permalink}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group relative aspect-square w-40 shrink-0 overflow-hidden rounded-2xl sm:w-48"
+                className="group relative aspect-square w-[28vw] max-w-[200px] shrink-0 overflow-hidden rounded-2xl"
                 aria-label={post.caption || "Instagram投稿"}
               >
                 <Image
@@ -65,7 +64,7 @@ export function InstagramSection() {
                   alt={post.caption || "Instagram投稿"}
                   fill
                   className="object-cover transition-transform duration-300 group-hover:scale-105"
-                  sizes="192px"
+                  sizes="(max-width: 640px) 28vw, 200px"
                 />
                 <div className="absolute inset-0 flex items-center justify-center rounded-2xl bg-black/0 transition-colors group-hover:bg-black/25">
                   <Instagram
