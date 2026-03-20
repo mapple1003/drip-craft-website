@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { AdminGuard } from "@/components/admin/AdminGuard";
 import { AdminNav } from "@/components/admin/AdminNav";
 import { getSiteContent, setSiteContent } from "@/lib/firestore";
-import type { SiteContentHero, SiteContentStory, SiteContentContact, StoryValue } from "@/types/admin";
+import type { SiteContentHero, SiteContentStory, SiteContentContact, SiteContentSettings, StoryValue } from "@/types/admin";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -23,6 +23,8 @@ export default function ContentPage() {
   const [savingHero, setSavingHero] = useState(false);
   const [savingStory, setSavingStory] = useState(false);
   const [savingContact, setSavingContact] = useState(false);
+  const [settings, setSettings] = useState<SiteContentSettings | null>(null);
+  const [savingSettings, setSavingSettings] = useState(false);
   const [uploadingHeroImage, setUploadingHeroImage] = useState(false);
   const [heroImageProgress, setHeroImageProgress] = useState(0);
   const [uploadingStoryImage, setUploadingStoryImage] = useState(false);
@@ -48,6 +50,9 @@ export default function ContentPage() {
         ],
         updatedAt: new Date(),
       });
+    });
+    getSiteContent<SiteContentSettings>("settings").then((data) => {
+      setSettings(data ?? { instagramHandle: "ekirei_219", updatedAt: new Date() });
     });
     getSiteContent<SiteContentContact>("contact").then((data) => {
       setContact(data ?? {
@@ -180,6 +185,19 @@ export default function ContentPage() {
       values[index] = { ...values[index], [field]: value };
       return { ...s, values };
     });
+  };
+
+  const saveSettings = async () => {
+    if (!settings) return;
+    setSavingSettings(true);
+    try {
+      await setSiteContent("settings", { instagramHandle: settings.instagramHandle });
+      toast.success("設定を保存しました");
+    } catch {
+      toast.error("保存に失敗しました");
+    } finally {
+      setSavingSettings(false);
+    }
   };
 
   const saveContact = async () => {
@@ -392,6 +410,31 @@ export default function ContentPage() {
                 </Button>
               </CardContent>
             </Card>
+            {/* Settings */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base">SNS設定</CardTitle>
+              </CardHeader>
+              <CardContent className="flex flex-col gap-4">
+                <div className="flex flex-col gap-1.5">
+                  <Label>Instagramアカウント名</Label>
+                  <div className="flex items-center gap-2">
+                    <span className="text-muted-foreground">@</span>
+                    <Input
+                      value={settings?.instagramHandle ?? ""}
+                      onChange={(e) => setSettings((s) => s ? { ...s, instagramHandle: e.target.value } : null)}
+                      placeholder="ekirei_219"
+                      className="flex-1"
+                    />
+                  </div>
+                  <p className="text-xs text-muted-foreground">フッターとInstagramセクションのボタンに反映されます</p>
+                </div>
+                <Button onClick={saveSettings} disabled={savingSettings} className="w-fit">
+                  {savingSettings ? <><Loader2 size={16} className="animate-spin mr-2" />保存中...</> : "保存する"}
+                </Button>
+              </CardContent>
+            </Card>
+
             {/* Contact Info */}
             <Card>
               <CardHeader>

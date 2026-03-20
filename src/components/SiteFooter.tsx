@@ -1,7 +1,20 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import { Separator } from "@/components/ui/separator";
 import { Instagram } from "lucide-react";
+import { getSiteContent } from "@/lib/firestore";
+import type { SiteContentSettings } from "@/types/admin";
 
 export function SiteFooter() {
+  const [handle, setHandle] = useState("ekirei_219");
+
+  useEffect(() => {
+    getSiteContent<SiteContentSettings>("settings").then((data) => {
+      if (data?.instagramHandle) setHandle(data.instagramHandle);
+    });
+  }, []);
+
   return (
     <footer className="border-t bg-card px-6 py-12">
       <div className="mx-auto max-w-6xl">
@@ -11,14 +24,14 @@ export function SiteFooter() {
             厳選したスペシャルティコーヒーを、毎日の一杯に。
           </p>
           <a
-            href="https://instagram.com"
+            href={`https://instagram.com/${handle}`}
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-primary"
             aria-label="Instagram"
           >
             <Instagram size={16} />
-            @ekirei_coffee
+            @{handle}
           </a>
         </div>
 

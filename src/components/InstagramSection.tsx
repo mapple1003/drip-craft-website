@@ -6,16 +6,22 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Instagram } from "lucide-react";
 import type { InstagramPost } from "@/app/api/instagram/route";
+import { getSiteContent } from "@/lib/firestore";
+import type { SiteContentSettings } from "@/types/admin";
 
 export function InstagramSection() {
   const [posts, setPosts] = useState<InstagramPost[]>([]);
   const [loading, setLoading] = useState(true);
+  const [handle, setHandle] = useState("ekirei_219");
 
   useEffect(() => {
     fetch("/api/instagram")
       .then((r) => r.json())
       .then((data) => setPosts(data.posts ?? []))
       .finally(() => setLoading(false));
+    getSiteContent<SiteContentSettings>("settings").then((data) => {
+      if (data?.instagramHandle) setHandle(data.instagramHandle);
+    });
   }, []);
 
   return (
@@ -80,13 +86,13 @@ export function InstagramSection() {
         {/* CTA */}
         <div className="text-center">
           <a
-            href="https://instagram.com/ekirei_219"
+            href={`https://instagram.com/${handle}`}
             target="_blank"
             rel="noopener noreferrer"
           >
             <Button variant="outline" className="gap-2 border-primary/30 text-primary hover:bg-primary/5">
               <Instagram size={16} />
-              @ekirei_219 をフォロー
+              @{handle} をフォロー
             </Button>
           </a>
         </div>

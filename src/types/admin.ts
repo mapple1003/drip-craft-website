@@ -36,6 +36,11 @@ export type SiteContentStory = {
   updatedAt: Date;
 };
 
+export type SiteContentSettings = {
+  instagramHandle: string;
+  updatedAt: Date;
+};
+
 export type SiteContentContact = {
   email: string;
   hours: string;
