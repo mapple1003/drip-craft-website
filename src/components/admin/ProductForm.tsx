@@ -7,13 +7,15 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
 import { createProduct, updateProduct } from "@/lib/firestore";
+import { storage } from "@/lib/firebase";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import type { ProductDoc } from "@/types/admin";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Loader2, Languages } from "lucide-react";
+import { Loader2, Languages, Upload } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 
 const productSchema = z.object({
@@ -40,7 +42,25 @@ export function ProductForm({ product }: Props) {
   const router = useRouter();
   const [isPending, setIsPending] = useState(false);
   const [isTranslating, setIsTranslating] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const isEdit = !!product;
+
+  const handleFileUpload = async (file: File) => {
+    setIsUploading(true);
+    try {
+      const ext = file.name.split(".").pop();
+      const filename = `${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
+      const storageRef = ref(storage, `products/${filename}`);
+      await uploadBytes(storageRef, file);
+      const url = await getDownloadURL(storageRef);
+      form.setValue("imageUrl", url);
+      toast.success("アップロード完了");
+    } catch {
+      toast.error("アップロードに失敗しました");
+    } finally {
+      setIsUploading(false);
+    }
+  };
 
   const form = useForm<ProductFormValues>({
     resolver: zodResolver(productSchema),
@@ -194,13 +214,37 @@ export function ProductForm({ product }: Props) {
               name="imageUrl"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>商品画像URL</FormLabel>
-                  <FormControl>
-                    <Input placeholder="/images/product-chibusanblend.png" {...field} />
-                  </FormControl>
-                  <p className="text-xs text-muted-foreground">
-                    public/images/ に画像を置いた場合は /images/ファイル名 と入力してください
-                  </p>
+                  <FormLabel>商品画像</FormLabel>
+                  <div className="flex gap-2">
+                    <FormControl>
+                      <Input placeholder="写真をアップロードするかURLを入力" {...field} />
+                    </FormControl>
+                    <label className="shrink-0">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) handleFileUpload(file);
+                          e.target.value = "";
+                        }}
+                      />
+                      <Button type="button" variant="outline" size="sm" asChild disabled={isUploading}>
+                        <span>
+                          {isUploading ? (
+                            <Loader2 size={14} className="animate-spin" />
+                          ) : (
+                            <><Upload size={14} className="mr-1" />アップロード</>
+                          )}
+                        </span>
+                      </Button>
+                    </label>
+                  </div>
+                  {field.value && (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={field.value} alt="preview" className="mt-2 h-32 w-auto rounded-lg object-cover border" />
+                  )}
                   <FormMessage />
                 </FormItem>
               )}
