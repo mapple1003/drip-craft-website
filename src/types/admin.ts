@@ -75,6 +75,7 @@ export type SpotDoc = {
   descriptionKo?: string;
   imageUrl?: string;
   imageUrls?: string[];
+  images?: { url: string; caption?: string }[];
   active: boolean;
   order: number;
   createdAt: Date;

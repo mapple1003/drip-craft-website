@@ -126,35 +126,47 @@ export default function SpotPage() {
 
         {/* Images */}
         {(() => {
-          const images = spot.imageUrls?.length ? spot.imageUrls : spot.imageUrl ? [spot.imageUrl] : [];
-          if (images.length === 0) return null;
+          const imgs: { url: string; caption?: string }[] = spot.images?.length
+            ? spot.images
+            : spot.imageUrls?.length
+            ? spot.imageUrls.map((url) => ({ url }))
+            : spot.imageUrl
+            ? [{ url: spot.imageUrl }]
+            : [];
+          if (imgs.length === 0) return null;
           return (
             <div className="mb-8 flex flex-col gap-3">
               <div className="overflow-hidden rounded-2xl shadow-sm">
                 <div className="relative aspect-video w-full">
                   <Image
-                    src={images[0]}
-                    alt={content.name}
+                    src={imgs[0].url}
+                    alt={imgs[0].caption || content.name}
                     fill
                     className="object-cover"
                     sizes="(max-width: 640px) 90vw, 512px"
                     priority
                   />
                 </div>
+                {imgs[0].caption && (
+                  <p className="px-3 py-2 text-xs text-muted-foreground bg-muted/50">{imgs[0].caption}</p>
+                )}
               </div>
-              {images.length > 1 && (
+              {imgs.length > 1 && (
                 <div className="grid grid-cols-2 gap-3">
-                  {images.slice(1).map((src, i) => (
+                  {imgs.slice(1).map((img, i) => (
                     <div key={i} className="overflow-hidden rounded-xl shadow-sm">
                       <div className="relative aspect-square w-full">
                         <Image
-                          src={src}
-                          alt={`${content.name} ${i + 2}`}
+                          src={img.url}
+                          alt={img.caption || `${content.name} ${i + 2}`}
                           fill
                           className="object-cover"
                           sizes="(max-width: 640px) 45vw, 240px"
                         />
                       </div>
+                      {img.caption && (
+                        <p className="px-2 py-1.5 text-xs text-muted-foreground bg-muted/50">{img.caption}</p>
+                      )}
                     </div>
                   ))}
                 </div>

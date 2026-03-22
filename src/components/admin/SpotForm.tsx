@@ -45,13 +45,15 @@ export function SpotForm({ spot }: { spot?: SpotDoc }) {
   const [translating, setTranslating] = useState(false);
   const isEdit = !!spot;
 
-  // 複数写真URL管理
-  const initUrls = () => {
-    if (spot?.imageUrls?.length) return spot.imageUrls;
-    if (spot?.imageUrl) return [spot.imageUrl];
-    return [""];
+  // 複数写真管理
+  type ImageEntry = { url: string; caption: string };
+  const initImages = (): ImageEntry[] => {
+    if (spot?.images?.length) return spot.images.map((img) => ({ url: img.url, caption: img.caption ?? "" }));
+    if (spot?.imageUrls?.length) return spot.imageUrls.map((url) => ({ url, caption: "" }));
+    if (spot?.imageUrl) return [{ url: spot.imageUrl, caption: "" }];
+    return [{ url: "", caption: "" }];
   };
-  const [imageUrls, setImageUrls] = useState<string[]>(initUrls);
+  const [images, setImages] = useState<ImageEntry[]>(initImages);
 
   const form = useForm<SpotFormValues>({
     resolver: zodResolver(spotSchema),
@@ -107,7 +109,7 @@ export function SpotForm({ spot }: { spot?: SpotDoc }) {
   const onSubmit = async (data: SpotFormValues) => {
     setIsPending(true);
     try {
-      const filteredUrls = imageUrls.filter((u) => u.trim() !== "");
+      const filteredImages = images.filter((img) => img.url.trim() !== "");
       const payload = {
         name: data.name,
         description: data.description,
@@ -117,8 +119,9 @@ export function SpotForm({ spot }: { spot?: SpotDoc }) {
         descriptionZh: data.descriptionZh ?? "",
         nameKo: data.nameKo ?? "",
         descriptionKo: data.descriptionKo ?? "",
-        imageUrl: filteredUrls[0] ?? "",
-        imageUrls: filteredUrls,
+        imageUrl: filteredImages[0]?.url ?? "",
+        imageUrls: filteredImages.map((img) => img.url),
+        images: filteredImages,
         order: Number(data.order),
         active: data.active,
       };
@@ -206,35 +209,47 @@ export function SpotForm({ spot }: { spot?: SpotDoc }) {
             ))}
 
             {/* Settings */}
-            <div className="flex flex-col gap-3">
+            <div className="flex flex-col gap-4">
               <div className="flex items-center justify-between">
-                <FormLabel>写真URL（複数可）</FormLabel>
+                <FormLabel>写真（複数可）</FormLabel>
                 <Button
                   type="button"
                   variant="outline"
                   size="sm"
-                  onClick={() => setImageUrls((prev) => [...prev, ""])}
+                  onClick={() => setImages((prev) => [...prev, { url: "", caption: "" }])}
                 >
                   <Plus size={14} className="mr-1" />写真を追加
                 </Button>
               </div>
-              {imageUrls.map((url, i) => (
-                <div key={i} className="flex gap-2">
-                  <Input
-                    placeholder={i === 0 ? "/images/spot-chibusan.jpg（メイン写真）" : `/images/spot-chibusan-${i + 1}.jpg`}
-                    value={url}
-                    onChange={(e) => {
-                      const next = [...imageUrls];
-                      next[i] = e.target.value;
-                      setImageUrls(next);
-                    }}
-                  />
-                  {imageUrls.length > 1 && (
+              {images.map((img, i) => (
+                <div key={i} className="flex gap-2 items-start">
+                  <div className="flex-1 flex flex-col gap-2">
+                    <Input
+                      placeholder={i === 0 ? "/images/spot-chibusan.jpg（メイン写真）" : `/images/spot-chibusan-${i + 1}.jpg`}
+                      value={img.url}
+                      onChange={(e) => {
+                        const next = [...images];
+                        next[i] = { ...next[i], url: e.target.value };
+                        setImages(next);
+                      }}
+                    />
+                    <Input
+                      placeholder="キャプション（例：チブサン古墳の石室入口）"
+                      value={img.caption}
+                      onChange={(e) => {
+                        const next = [...images];
+                        next[i] = { ...next[i], caption: e.target.value };
+                        setImages(next);
+                      }}
+                    />
+                  </div>
+                  {images.length > 1 && (
                     <Button
                       type="button"
                       variant="ghost"
                       size="icon"
-                      onClick={() => setImageUrls((prev) => prev.filter((_, j) => j !== i))}
+                      className="mt-1"
+                      onClick={() => setImages((prev) => prev.filter((_, j) => j !== i))}
                     >
                       <Trash2 size={14} />
                     </Button>
