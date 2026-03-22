@@ -48,6 +48,7 @@ export type SiteContentContact = {
   hours: string;
   hoursNote: string;
   location: string;
+  description?: string;
   updatedAt: Date;
 };
 

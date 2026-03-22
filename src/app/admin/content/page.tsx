@@ -60,6 +60,7 @@ export default function ContentPage() {
         hours: "平日 10:00〜17:00",
         hoursNote: "（土日祝は翌営業日対応）",
         location: "東京都",
+        description: "ご質問・ギフトのご相談・まとめ買いのご依頼など、お気軽にご連絡ください。",
         updatedAt: new Date(),
       });
     });
@@ -213,6 +214,7 @@ export default function ContentPage() {
         hours: contact.hours,
         hoursNote: contact.hoursNote,
         location: contact.location,
+        description: contact.description ?? "",
       });
       toast.success("お問い合わせ情報を保存しました");
     } catch {
@@ -461,6 +463,15 @@ export default function ContentPage() {
                 <CardTitle className="text-base">お問い合わせ情報</CardTitle>
               </CardHeader>
               <CardContent className="flex flex-col gap-4">
+                <div className="flex flex-col gap-1.5">
+                  <Label>説明文</Label>
+                  <Textarea
+                    rows={2}
+                    value={contact?.description ?? ""}
+                    onChange={(e) => setContact((c) => c ? { ...c, description: e.target.value } : null)}
+                    placeholder="ご質問・ギフトのご相談・まとめ買いのご依頼など、お気軽にご連絡ください。"
+                  />
+                </div>
                 <div className="flex flex-col gap-1.5">
                   <Label>メールアドレス</Label>
                   <Input

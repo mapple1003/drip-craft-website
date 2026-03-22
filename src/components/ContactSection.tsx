@@ -34,6 +34,7 @@ const DEFAULT_CONTACT_INFO: SiteContentContact = {
   hours: "平日 10:00〜17:00",
   hoursNote: "（土日祝は翌営業日対応）",
   location: "東京都",
+  description: "ご質問・ギフトのご相談・まとめ買いのご依頼など、お気軽にご連絡ください。",
   updatedAt: new Date(),
 };
 
@@ -88,11 +89,9 @@ export function ContactSection() {
             お問い合わせ
           </h2>
           <p className="mb-4 text-sm tracking-wide text-muted-foreground">Contact Us</p>
-          <p className="text-muted-foreground">
-            ご質問・ギフトのご相談・まとめ買いのご依頼など、
-            <br className="hidden sm:block" />
-            お気軽にご連絡ください。
-          </p>
+          {info.description && (
+            <p className="text-muted-foreground whitespace-pre-wrap">{info.description}</p>
+          )}
         </div>
 
         <div className="grid gap-12 md:grid-cols-5">
