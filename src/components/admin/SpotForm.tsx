@@ -7,6 +7,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
 import { createSpot, updateSpot } from "@/lib/firestore";
+import { storage } from "@/lib/firebase";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import type { SpotDoc } from "@/types/admin";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -14,7 +16,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
-import { Loader2, Sparkles, Plus, Trash2 } from "lucide-react";
+import { Loader2, Sparkles, Plus, Trash2, Upload } from "lucide-react";
 
 const spotSchema = z.object({
   name: z.string().min(1, "入力してください"),
@@ -54,6 +56,26 @@ export function SpotForm({ spot }: { spot?: SpotDoc }) {
     return [{ url: "", caption: "" }];
   };
   const [images, setImages] = useState<ImageEntry[]>(initImages);
+  const [uploadingIndex, setUploadingIndex] = useState<number | null>(null);
+
+  const handleFileUpload = async (file: File, index: number) => {
+    setUploadingIndex(index);
+    try {
+      const ext = file.name.split(".").pop();
+      const filename = `${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
+      const storageRef = ref(storage, `spots/${filename}`);
+      await uploadBytes(storageRef, file);
+      const url = await getDownloadURL(storageRef);
+      const next = [...images];
+      next[index] = { ...next[index], url };
+      setImages(next);
+      toast.success("アップロード完了");
+    } catch {
+      toast.error("アップロードに失敗しました");
+    } finally {
+      setUploadingIndex(null);
+    }
+  };
 
   const form = useForm<SpotFormValues>({
     resolver: zodResolver(spotSchema),
@@ -224,15 +246,43 @@ export function SpotForm({ spot }: { spot?: SpotDoc }) {
               {images.map((img, i) => (
                 <div key={i} className="flex gap-2 items-start">
                   <div className="flex-1 flex flex-col gap-2">
-                    <Input
-                      placeholder={i === 0 ? "/images/spot-chibusan.jpg（メイン写真）" : `/images/spot-chibusan-${i + 1}.jpg`}
-                      value={img.url}
-                      onChange={(e) => {
-                        const next = [...images];
-                        next[i] = { ...next[i], url: e.target.value };
-                        setImages(next);
-                      }}
-                    />
+                    <div className="flex gap-2">
+                      <Input
+                        placeholder="写真をアップロードするかURLを入力"
+                        value={img.url}
+                        onChange={(e) => {
+                          const next = [...images];
+                          next[i] = { ...next[i], url: e.target.value };
+                          setImages(next);
+                        }}
+                        className="flex-1"
+                      />
+                      <label className="shrink-0">
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) handleFileUpload(file, i);
+                            e.target.value = "";
+                          }}
+                        />
+                        <Button type="button" variant="outline" size="sm" asChild disabled={uploadingIndex === i}>
+                          <span>
+                            {uploadingIndex === i ? (
+                              <Loader2 size={14} className="animate-spin" />
+                            ) : (
+                              <><Upload size={14} className="mr-1" />アップロード</>
+                            )}
+                          </span>
+                        </Button>
+                      </label>
+                    </div>
+                    {img.url && (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={img.url} alt="preview" className="h-24 w-auto rounded-lg object-cover border" />
+                    )}
                     <Input
                       placeholder="キャプション（例：チブサン古墳の石室入口）"
                       value={img.caption}
@@ -256,7 +306,7 @@ export function SpotForm({ spot }: { spot?: SpotDoc }) {
                   )}
                 </div>
               ))}
-              <p className="text-xs text-muted-foreground">public/images/ に画像を置いた場合は /images/ファイル名。1枚目がメイン写真になります。</p>
+              <p className="text-xs text-muted-foreground">1枚目がメイン写真になります。</p>
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
               <FormField control={form.control} name="order" render={({ field }) => (
