@@ -2,6 +2,7 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { HeroSection } from "@/components/HeroSection";
 import { ProductsSection } from "@/components/ProductsSection";
 import { StorySection } from "@/components/StorySection";
+import { EventsSection } from "@/components/EventsSection";
 import { StoresSection } from "@/components/StoresSection";
 import { InstagramSection } from "@/components/InstagramSection";
 import { ContactSection } from "@/components/ContactSection";
@@ -15,6 +16,7 @@ export default function Home() {
         <HeroSection />
         <ProductsSection />
         <StorySection />
+        <EventsSection />
         <StoresSection />
         <InstagramSection />
         <ContactSection />

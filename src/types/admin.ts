@@ -90,3 +90,17 @@ export type ContactDoc = {
   message: string;
   createdAt: Date;
 };
+
+export type EventDoc = {
+  id: string;
+  title: string;
+  date: string;
+  location: string;
+  address?: string;
+  description?: string;
+  url?: string;
+  active: boolean;
+  order: number;
+  createdAt: Date;
+  updatedAt: Date;
+};

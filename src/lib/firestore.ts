@@ -13,7 +13,7 @@ import {
   Timestamp,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
-import type { ProductDoc, SiteContentHero, SiteContentStory, SiteContentContact, SiteContentSettings, StoreDoc, SpotDoc, ContactDoc } from "@/types/admin";
+import type { ProductDoc, SiteContentHero, SiteContentStory, SiteContentContact, SiteContentSettings, StoreDoc, SpotDoc, ContactDoc, EventDoc } from "@/types/admin";
 
 // --- Products ---
 
@@ -156,6 +156,50 @@ export async function updateSpot(id: string, data: Partial<Omit<SpotDoc, "id" | 
 
 export async function deleteSpot(id: string): Promise<void> {
   await deleteDoc(doc(db, "spots", id));
+}
+
+// --- Contacts ---
+
+// --- Events ---
+
+export async function getEvents(): Promise<EventDoc[]> {
+  const q = query(collection(db, "events"), orderBy("order", "asc"));
+  const snap = await getDocs(q);
+  return snap.docs.map((d) => ({
+    id: d.id,
+    ...(d.data() as Omit<EventDoc, "id" | "createdAt" | "updatedAt">),
+    createdAt: (d.data().createdAt as Timestamp)?.toDate() ?? new Date(),
+    updatedAt: (d.data().updatedAt as Timestamp)?.toDate() ?? new Date(),
+  }));
+}
+
+export async function getEvent(id: string): Promise<EventDoc | null> {
+  const snap = await getDoc(doc(db, "events", id));
+  if (!snap.exists()) return null;
+  const d = snap.data();
+  return {
+    id: snap.id,
+    ...(d as Omit<EventDoc, "id" | "createdAt" | "updatedAt">),
+    createdAt: (d.createdAt as Timestamp)?.toDate() ?? new Date(),
+    updatedAt: (d.updatedAt as Timestamp)?.toDate() ?? new Date(),
+  };
+}
+
+export async function createEvent(data: Omit<EventDoc, "id" | "createdAt" | "updatedAt">): Promise<string> {
+  const ref = await addDoc(collection(db, "events"), {
+    ...data,
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp(),
+  });
+  return ref.id;
+}
+
+export async function updateEvent(id: string, data: Partial<Omit<EventDoc, "id" | "createdAt" | "updatedAt">>): Promise<void> {
+  await updateDoc(doc(db, "events", id), { ...data, updatedAt: serverTimestamp() });
+}
+
+export async function deleteEvent(id: string): Promise<void> {
+  await deleteDoc(doc(db, "events", id));
 }
 
 // --- Contacts ---
