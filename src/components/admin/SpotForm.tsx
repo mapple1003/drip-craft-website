@@ -14,7 +14,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
-import { Loader2, Sparkles } from "lucide-react";
+import { Loader2, Sparkles, Plus, Trash2 } from "lucide-react";
 
 const spotSchema = z.object({
   name: z.string().min(1, "入力してください"),
@@ -25,7 +25,6 @@ const spotSchema = z.object({
   descriptionZh: z.string().optional(),
   nameKo: z.string().optional(),
   descriptionKo: z.string().optional(),
-  imageUrl: z.string().optional(),
   order: z.string(),
   active: z.boolean(),
 });
@@ -46,6 +45,14 @@ export function SpotForm({ spot }: { spot?: SpotDoc }) {
   const [translating, setTranslating] = useState(false);
   const isEdit = !!spot;
 
+  // 複数写真URL管理
+  const initUrls = () => {
+    if (spot?.imageUrls?.length) return spot.imageUrls;
+    if (spot?.imageUrl) return [spot.imageUrl];
+    return [""];
+  };
+  const [imageUrls, setImageUrls] = useState<string[]>(initUrls);
+
   const form = useForm<SpotFormValues>({
     resolver: zodResolver(spotSchema),
     defaultValues: {
@@ -57,7 +64,6 @@ export function SpotForm({ spot }: { spot?: SpotDoc }) {
       descriptionZh: spot?.descriptionZh ?? "",
       nameKo: spot?.nameKo ?? "",
       descriptionKo: spot?.descriptionKo ?? "",
-      imageUrl: spot?.imageUrl ?? "",
       order: String(spot?.order ?? 0),
       active: spot?.active ?? true,
     },
@@ -101,6 +107,7 @@ export function SpotForm({ spot }: { spot?: SpotDoc }) {
   const onSubmit = async (data: SpotFormValues) => {
     setIsPending(true);
     try {
+      const filteredUrls = imageUrls.filter((u) => u.trim() !== "");
       const payload = {
         name: data.name,
         description: data.description,
@@ -110,7 +117,8 @@ export function SpotForm({ spot }: { spot?: SpotDoc }) {
         descriptionZh: data.descriptionZh ?? "",
         nameKo: data.nameKo ?? "",
         descriptionKo: data.descriptionKo ?? "",
-        imageUrl: data.imageUrl ?? "",
+        imageUrl: filteredUrls[0] ?? "",
+        imageUrls: filteredUrls,
         order: Number(data.order),
         active: data.active,
       };
@@ -198,14 +206,43 @@ export function SpotForm({ spot }: { spot?: SpotDoc }) {
             ))}
 
             {/* Settings */}
-            <FormField control={form.control} name="imageUrl" render={({ field }) => (
-              <FormItem>
-                <FormLabel>写真URL（任意）</FormLabel>
-                <FormControl><Input placeholder="/images/spot-chibusan.jpg" {...field} /></FormControl>
-                <p className="text-xs text-muted-foreground">public/images/ に画像を置いた場合は /images/ファイル名</p>
-                <FormMessage />
-              </FormItem>
-            )} />
+            <div className="flex flex-col gap-3">
+              <div className="flex items-center justify-between">
+                <FormLabel>写真URL（複数可）</FormLabel>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setImageUrls((prev) => [...prev, ""])}
+                >
+                  <Plus size={14} className="mr-1" />写真を追加
+                </Button>
+              </div>
+              {imageUrls.map((url, i) => (
+                <div key={i} className="flex gap-2">
+                  <Input
+                    placeholder={i === 0 ? "/images/spot-chibusan.jpg（メイン写真）" : `/images/spot-chibusan-${i + 1}.jpg`}
+                    value={url}
+                    onChange={(e) => {
+                      const next = [...imageUrls];
+                      next[i] = e.target.value;
+                      setImageUrls(next);
+                    }}
+                  />
+                  {imageUrls.length > 1 && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => setImageUrls((prev) => prev.filter((_, j) => j !== i))}
+                    >
+                      <Trash2 size={14} />
+                    </Button>
+                  )}
+                </div>
+              ))}
+              <p className="text-xs text-muted-foreground">public/images/ に画像を置いた場合は /images/ファイル名。1枚目がメイン写真になります。</p>
+            </div>
             <div className="grid gap-4 sm:grid-cols-2">
               <FormField control={form.control} name="order" render={({ field }) => (
                 <FormItem>

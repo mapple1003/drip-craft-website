@@ -124,21 +124,44 @@ export default function SpotPage() {
           </div>
         )}
 
-        {/* Image */}
-        {spot.imageUrl && (
-          <div className="mb-8 overflow-hidden rounded-2xl shadow-sm">
-            <div className="relative aspect-video w-full">
-              <Image
-                src={spot.imageUrl}
-                alt={content.name}
-                fill
-                className="object-cover"
-                sizes="(max-width: 640px) 90vw, 512px"
-                priority
-              />
+        {/* Images */}
+        {(() => {
+          const images = spot.imageUrls?.length ? spot.imageUrls : spot.imageUrl ? [spot.imageUrl] : [];
+          if (images.length === 0) return null;
+          return (
+            <div className="mb-8 flex flex-col gap-3">
+              <div className="overflow-hidden rounded-2xl shadow-sm">
+                <div className="relative aspect-video w-full">
+                  <Image
+                    src={images[0]}
+                    alt={content.name}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 640px) 90vw, 512px"
+                    priority
+                  />
+                </div>
+              </div>
+              {images.length > 1 && (
+                <div className="grid grid-cols-2 gap-3">
+                  {images.slice(1).map((src, i) => (
+                    <div key={i} className="overflow-hidden rounded-xl shadow-sm">
+                      <div className="relative aspect-square w-full">
+                        <Image
+                          src={src}
+                          alt={`${content.name} ${i + 2}`}
+                          fill
+                          className="object-cover"
+                          sizes="(max-width: 640px) 45vw, 240px"
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
-          </div>
-        )}
+          );
+        })()}
 
         {/* Content */}
         <div className="mb-8">
