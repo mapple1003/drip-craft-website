@@ -39,6 +39,7 @@ type Props = {
 export function ProductForm({ product }: Props) {
   const router = useRouter();
   const [isPending, setIsPending] = useState(false);
+  const [isTranslating, setIsTranslating] = useState(false);
   const isEdit = !!product;
 
   const form = useForm<ProductFormValues>({
@@ -56,6 +57,30 @@ export function ProductForm({ product }: Props) {
       flavorEn: product?.flavorEn?.join(", ") ?? "",
     },
   });
+
+  const handleAutoTranslate = async () => {
+    const { name, description, flavor } = form.getValues();
+    if (!name && !description && !flavor) {
+      toast.error("翻訳する日本語テキストを入力してください");
+      return;
+    }
+    setIsTranslating(true);
+    try {
+      const [nameRes, descRes, flavorRes] = await Promise.all([
+        name ? fetch("/api/translate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ text: name, targets: ["EN-US"] }) }).then(r => r.json()) : null,
+        description ? fetch("/api/translate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ text: description, targets: ["EN-US"] }) }).then(r => r.json()) : null,
+        flavor ? fetch("/api/translate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ text: flavor, targets: ["EN-US"] }) }).then(r => r.json()) : null,
+      ]);
+      if (nameRes?.["EN-US"]) form.setValue("nameEn", nameRes["EN-US"]);
+      if (descRes?.["EN-US"]) form.setValue("descriptionEn", descRes["EN-US"]);
+      if (flavorRes?.["EN-US"]) form.setValue("flavorEn", flavorRes["EN-US"]);
+      toast.success("自動翻訳しました");
+    } catch {
+      toast.error("翻訳に失敗しました");
+    } finally {
+      setIsTranslating(false);
+    }
+  };
 
   const onSubmit = async (data: ProductFormValues) => {
     setIsPending(true);
@@ -183,9 +208,24 @@ export function ProductForm({ product }: Props) {
 
             {/* English section */}
             <Separator />
-            <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
-              <Languages size={16} />
-              英語ページ用コンテンツ（任意）
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+                <Languages size={16} />
+                英語ページ用コンテンツ（任意）
+              </div>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={handleAutoTranslate}
+                disabled={isTranslating}
+              >
+                {isTranslating ? (
+                  <><Loader2 size={14} className="animate-spin mr-1" />翻訳中...</>
+                ) : (
+                  <><Languages size={14} className="mr-1" />自動翻訳</>
+                )}
+              </Button>
             </div>
             <p className="text-xs text-muted-foreground -mt-3">
               入力すると商品ページに「English」ボタンが表示されます
