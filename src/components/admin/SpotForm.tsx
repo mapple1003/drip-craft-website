@@ -49,10 +49,14 @@ export function SpotForm({ spot }: { spot?: SpotDoc }) {
 
   // 複数写真管理
   type ImageEntry = { url: string; caption: string };
+  const normalizeUrl = (url: string) => {
+    if (!url || url.startsWith("http") || url.startsWith("/")) return url;
+    return `/${url}`;
+  };
   const initImages = (): ImageEntry[] => {
-    if (spot?.images?.length) return spot.images.map((img) => ({ url: img.url, caption: img.caption ?? "" }));
-    if (spot?.imageUrls?.length) return spot.imageUrls.map((url) => ({ url, caption: "" }));
-    if (spot?.imageUrl) return [{ url: spot.imageUrl, caption: "" }];
+    if (spot?.images?.length) return spot.images.map((img) => ({ url: normalizeUrl(img.url), caption: img.caption ?? "" }));
+    if (spot?.imageUrls?.length) return spot.imageUrls.map((url) => ({ url: normalizeUrl(url), caption: "" }));
+    if (spot?.imageUrl) return [{ url: normalizeUrl(spot.imageUrl), caption: "" }];
     return [{ url: "", caption: "" }];
   };
   const [images, setImages] = useState<ImageEntry[]>(initImages);
