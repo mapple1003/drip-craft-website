@@ -115,7 +115,7 @@ export default function ProductDetailPage() {
               <p className="text-sm text-muted-foreground">価格</p>
               <p className="text-3xl font-bold text-foreground">
                 ¥{product.price.toLocaleString("ja-JP")}
-                <span className="text-sm font-normal text-muted-foreground"> （税込）</span>
+                <span className="text-sm font-normal text-muted-foreground"> （税抜）</span>
               </p>
             </div>
 

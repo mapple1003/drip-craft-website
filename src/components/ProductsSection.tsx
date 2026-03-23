@@ -100,7 +100,7 @@ export function ProductsSection() {
                   <CardFooter className="flex items-center justify-between">
                     <span className="text-lg font-bold text-foreground">
                       ¥{product.price.toLocaleString("ja-JP")}
-                      <span className="text-xs font-normal text-muted-foreground"> /個</span>
+                      <span className="text-xs font-normal text-muted-foreground"> /個（税抜）</span>
                     </span>
                     <Button size="sm" variant="outline" className="border-primary/30 text-primary hover:bg-primary/5" asChild>
                       <span>詳細を見る</span>
