@@ -311,13 +311,14 @@ export default function SpotPage() {
 
             {/* Check-in card */}
             <div className="rounded-2xl border border-border bg-muted/20 p-5">
-              <p className="mb-3 text-sm font-semibold text-foreground">
-                🗺️ 訪問チェックイン
-              </p>
+              <div className="mb-3">
+                <p className="text-sm font-semibold text-foreground">🗺️ 訪問チェックイン</p>
+                <p className="text-xs text-muted-foreground">Visit Check-in</p>
+              </div>
               {isVisited ? (
                 <div className="flex items-center gap-2 text-sm font-medium" style={{ color: "#539d84" }}>
                   <CheckCircle2 size={16} />
-                  訪問済みです！探訪者トロフィー獲得
+                  <span>訪問済みです！探訪者トロフィー獲得 <span className="font-normal opacity-70">/ Explorer Trophy Unlocked</span></span>
                 </div>
               ) : (
                 <div className="flex flex-col gap-2">
@@ -329,9 +330,9 @@ export default function SpotPage() {
                       style={{ background: "#539d84" }}
                     >
                       {gpsLoading ? (
-                        <><Loader2 size={16} className="animate-spin" />位置情報を取得中...</>
+                        <><Loader2 size={16} className="animate-spin" />位置情報を取得中... / Getting location...</>
                       ) : (
-                        <><Navigation size={16} />GPSで現地チェックイン（{GPS_THRESHOLD_METERS}m以内）</>
+                        <><Navigation size={16} />GPS チェックイン / GPS Check-in ({GPS_THRESHOLD_METERS}m)</>
                       )}
                     </button>
                   )}
@@ -340,7 +341,7 @@ export default function SpotPage() {
                     className="flex items-center justify-center gap-2 rounded-full border border-border py-3 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
                   >
                     <CheckCircle2 size={16} />
-                    手動で訪問済みにする
+                    手動で訪問済みにする / Mark as Visited
                   </button>
                   {gpsError && (
                     <p className="text-xs text-destructive leading-relaxed">{gpsError}</p>
