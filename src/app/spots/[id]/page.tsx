@@ -1,15 +1,19 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { Skeleton } from "@/components/ui/skeleton";
-import { MapPin } from "lucide-react";
+import { MapPin, Navigation, CheckCircle2, Loader2, BookOpen } from "lucide-react";
 import { getSpot } from "@/lib/firestore";
+import { markScanned, markVisited, getSpotStatus, distanceMeters } from "@/lib/collection";
 import type { SpotDoc } from "@/types/admin";
+import { SpotMap } from "@/components/SpotMap";
+import { TrophyOverlay } from "@/components/TrophyOverlay";
 
 type Lang = "ja" | "en" | "zh" | "ko";
+type TrophyType = "collector" | "explorer";
 
 const LANGS: { code: Lang; label: string; flag: string }[] = [
   { code: "ja", label: "日本語", flag: "🇯🇵" },
@@ -18,23 +22,16 @@ const LANGS: { code: Lang; label: string; flag: string }[] = [
   { code: "ko", label: "한국어", flag: "🇰🇷" },
 ];
 
+const GPS_THRESHOLD_METERS = 300;
+
 function getContent(spot: SpotDoc, lang: Lang) {
   switch (lang) {
     case "en":
-      return {
-        name: spot.nameEn || spot.name,
-        description: spot.descriptionEn || spot.description,
-      };
+      return { name: spot.nameEn || spot.name, description: spot.descriptionEn || spot.description };
     case "zh":
-      return {
-        name: spot.nameZh || spot.name,
-        description: spot.descriptionZh || spot.description,
-      };
+      return { name: spot.nameZh || spot.name, description: spot.descriptionZh || spot.description };
     case "ko":
-      return {
-        name: spot.nameKo || spot.name,
-        description: spot.descriptionKo || spot.description,
-      };
+      return { name: spot.nameKo || spot.name, description: spot.descriptionKo || spot.description };
     default:
       return { name: spot.name, description: spot.description };
   }
@@ -44,9 +41,31 @@ export default function SpotPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
   const searchParams = useSearchParams();
+
   const [spot, setSpot] = useState<SpotDoc | null>(null);
   const [loading, setLoading] = useState(true);
   const [lang, setLang] = useState<Lang>((searchParams.get("lang") as Lang) ?? "ja");
+
+  // Collection state
+  const [isScanned, setIsScanned] = useState(false);
+  const [isVisited, setIsVisited] = useState(false);
+  const [trophyType, setTrophyType] = useState<TrophyType | null>(null);
+
+  // GPS check-in state
+  const [gpsLoading, setGpsLoading] = useState(false);
+  const [gpsError, setGpsError] = useState<string | null>(null);
+
+  // On mount: mark scanned and load status
+  useEffect(() => {
+    const { isNew } = markScanned(id);
+    const status = getSpotStatus(id);
+    setIsScanned(status.scanned);
+    setIsVisited(status.visited);
+    if (isNew) {
+      // Show trophy after short delay so page renders first
+      setTimeout(() => setTrophyType("collector"), 600);
+    }
+  }, [id]);
 
   useEffect(() => {
     getSpot(id)
@@ -64,12 +83,54 @@ export default function SpotPage() {
     router.replace(`/spots/${id}?${params.toString()}`, { scroll: false });
   };
 
+  const handleGpsCheckin = useCallback(() => {
+    if (!spot?.lat || !spot?.lng) return;
+    setGpsLoading(true);
+    setGpsError(null);
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const dist = distanceMeters(
+          pos.coords.latitude,
+          pos.coords.longitude,
+          spot.lat!,
+          spot.lng!
+        );
+        if (dist <= GPS_THRESHOLD_METERS) {
+          const { isNew } = markVisited(id, "gps");
+          setIsVisited(true);
+          if (isNew) setTrophyType("explorer");
+        } else {
+          setGpsError(
+            `現在地から約${Math.round(dist)}m離れています。現地（${GPS_THRESHOLD_METERS}m以内）でチェックインしてください。`
+          );
+        }
+        setGpsLoading(false);
+      },
+      () => {
+        setGpsError("位置情報の取得に失敗しました。設定を確認してください。");
+        setGpsLoading(false);
+      },
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
+  }, [spot, id]);
+
+  const handleManualCheckin = useCallback(() => {
+    const { isNew } = markVisited(id, "manual");
+    setIsVisited(true);
+    if (isNew) setTrophyType("explorer");
+  }, [id]);
+
+  const googleMapsUrl =
+    spot?.lat && spot?.lng
+      ? `https://www.google.com/maps/dir/?api=1&destination=${spot.lat},${spot.lng}`
+      : null;
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background">
         <div className="mx-auto max-w-lg px-6 py-12">
           <Skeleton className="mb-6 h-8 w-32" />
-          <Skeleton className="mb-4 aspect-square w-full rounded-2xl" />
+          <Skeleton className="mb-4 aspect-video w-full rounded-2xl" />
           <Skeleton className="mb-3 h-8 w-3/4" />
           <Skeleton className="h-4 w-full" />
           <Skeleton className="mt-2 h-4 w-5/6" />
@@ -82,7 +143,6 @@ export default function SpotPage() {
 
   const content = getContent(spot, lang);
 
-  // Determine which languages have translations
   const availableLangs = LANGS.filter(({ code }) => {
     if (code === "ja") return true;
     if (code === "en") return !!(spot.nameEn || spot.descriptionEn);
@@ -93,17 +153,56 @@ export default function SpotPage() {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Trophy overlay */}
+      {trophyType && spot && (
+        <TrophyOverlay
+          type={trophyType}
+          spotName={spot.name}
+          onClose={() => setTrophyType(null)}
+        />
+      )}
+
       {/* Header */}
       <header className="border-b border-border bg-background/90 backdrop-blur-sm">
         <div className="mx-auto flex max-w-lg items-center justify-between px-6 py-4">
           <Link href="/" className="text-lg font-bold tracking-widest text-primary">
             EKIREI
           </Link>
-          <span className="text-xs text-muted-foreground">Specialty Coffee Drip Bag</span>
+          <Link
+            href="/collection"
+            className="flex items-center gap-1.5 rounded-full border border-border px-3 py-1.5 text-xs font-medium text-muted-foreground hover:border-primary/50 hover:text-primary transition-colors"
+          >
+            <BookOpen size={12} />
+            コレクション
+          </Link>
         </div>
       </header>
 
       <main className="mx-auto max-w-lg px-6 py-10">
+        {/* Trophy badges */}
+        <div className="mb-6 flex gap-2">
+          <div
+            className={`flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium border transition-all ${
+              isScanned
+                ? "border-[#693c85] bg-[#693c85]/10 text-[#693c85]"
+                : "border-border bg-muted/30 text-muted-foreground"
+            }`}
+          >
+            <span>🎫</span>
+            <span>コレクター</span>
+          </div>
+          <div
+            className={`flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium border transition-all ${
+              isVisited
+                ? "border-[#539d84] bg-[#539d84]/10 text-[#539d84]"
+                : "border-border bg-muted/30 text-muted-foreground"
+            }`}
+          >
+            <span>🗺️</span>
+            <span>探訪者</span>
+          </div>
+        </div>
+
         {/* Language switcher */}
         {availableLangs.length > 1 && (
           <div className="mb-8 flex flex-wrap gap-2">
@@ -189,6 +288,69 @@ export default function SpotPage() {
           </p>
         </div>
 
+        {/* Map & Check-in section */}
+        {spot.lat && spot.lng && (
+          <div className="mb-8 flex flex-col gap-4">
+            {/* Map */}
+            <div className="overflow-hidden rounded-2xl border border-border shadow-sm" style={{ height: 240 }}>
+              <SpotMap lat={spot.lat} lng={spot.lng} name={spot.name} />
+            </div>
+
+            {/* Google Maps link */}
+            {googleMapsUrl && (
+              <a
+                href={googleMapsUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center gap-2 rounded-full border border-border bg-white py-3 text-sm font-medium text-foreground shadow-sm hover:border-primary/50 hover:text-primary transition-colors"
+              >
+                <Navigation size={16} />
+                Googleマップで案内する
+              </a>
+            )}
+
+            {/* Check-in card */}
+            <div className="rounded-2xl border border-border bg-muted/20 p-5">
+              <p className="mb-3 text-sm font-semibold text-foreground">
+                🗺️ 訪問チェックイン
+              </p>
+              {isVisited ? (
+                <div className="flex items-center gap-2 text-sm font-medium" style={{ color: "#539d84" }}>
+                  <CheckCircle2 size={16} />
+                  訪問済みです！探訪者トロフィー獲得
+                </div>
+              ) : (
+                <div className="flex flex-col gap-2">
+                  {spot.lat && spot.lng && (
+                    <button
+                      onClick={handleGpsCheckin}
+                      disabled={gpsLoading}
+                      className="flex items-center justify-center gap-2 rounded-full py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-60"
+                      style={{ background: "#539d84" }}
+                    >
+                      {gpsLoading ? (
+                        <><Loader2 size={16} className="animate-spin" />位置情報を取得中...</>
+                      ) : (
+                        <><Navigation size={16} />GPSで現地チェックイン（{GPS_THRESHOLD_METERS}m以内）</>
+                      )}
+                    </button>
+                  )}
+                  <button
+                    onClick={handleManualCheckin}
+                    className="flex items-center justify-center gap-2 rounded-full border border-border py-3 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    <CheckCircle2 size={16} />
+                    手動で訪問済みにする
+                  </button>
+                  {gpsError && (
+                    <p className="text-xs text-destructive leading-relaxed">{gpsError}</p>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
         {/* Coffee pairing note */}
         <div
           className="rounded-2xl p-5 text-sm leading-relaxed"
@@ -208,8 +370,19 @@ export default function SpotPage() {
           </p>
         </div>
 
-        {/* Footer CTA */}
-        <div className="mt-10 text-center">
+        {/* Footer */}
+        <div className="mt-10 flex flex-col items-center gap-3 text-center">
+          <Link
+            href="/collection"
+            className="flex items-center gap-2 rounded-full px-6 py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+            style={{ background: "#693c85" }}
+          >
+            <BookOpen size={16} />
+            {lang === "ja" && "自分のコレクションを見る"}
+            {lang === "en" && "View my collection"}
+            {lang === "zh" && "查看我的收藏"}
+            {lang === "ko" && "내 컬렉션 보기"}
+          </Link>
           <Link
             href="/"
             className="text-sm text-primary underline underline-offset-4 hover:text-primary/80"

@@ -16,7 +16,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
-import { Loader2, Sparkles, Plus, Trash2, Upload } from "lucide-react";
+import { Loader2, Sparkles, Plus, Trash2, Upload, MapPin } from "lucide-react";
 
 const spotSchema = z.object({
   name: z.string().min(1, "入力してください"),
@@ -27,6 +27,8 @@ const spotSchema = z.object({
   descriptionZh: z.string().optional(),
   nameKo: z.string().optional(),
   descriptionKo: z.string().optional(),
+  lat: z.string().optional(),
+  lng: z.string().optional(),
   order: z.string(),
   active: z.boolean(),
 });
@@ -92,6 +94,8 @@ export function SpotForm({ spot }: { spot?: SpotDoc }) {
       descriptionZh: spot?.descriptionZh ?? "",
       nameKo: spot?.nameKo ?? "",
       descriptionKo: spot?.descriptionKo ?? "",
+      lat: spot?.lat != null ? String(spot.lat) : "",
+      lng: spot?.lng != null ? String(spot.lng) : "",
       order: String(spot?.order ?? 0),
       active: spot?.active ?? true,
     },
@@ -148,6 +152,8 @@ export function SpotForm({ spot }: { spot?: SpotDoc }) {
         imageUrl: filteredImages[0]?.url ?? "",
         imageUrls: filteredImages.map((img) => img.url),
         images: filteredImages,
+        lat: data.lat ? Number(data.lat) : undefined,
+        lng: data.lng ? Number(data.lng) : undefined,
         order: Number(data.order),
         active: data.active,
       };
@@ -312,6 +318,33 @@ export function SpotForm({ spot }: { spot?: SpotDoc }) {
               ))}
               <p className="text-xs text-muted-foreground">1枚目がメイン写真になります。</p>
             </div>
+            {/* Location */}
+            <div className="rounded-xl border border-border bg-muted/30 p-4 flex flex-col gap-3">
+              <div className="flex items-center gap-2 text-sm font-medium">
+                <MapPin size={14} className="text-primary" />
+                <span>位置情報（QRコード地図表示用）</span>
+              </div>
+              <div className="grid gap-3 sm:grid-cols-2">
+                <FormField control={form.control} name="lat" render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>緯度（Latitude）</FormLabel>
+                    <FormControl><Input type="number" step="any" placeholder="例：32.9942" {...field} /></FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )} />
+                <FormField control={form.control} name="lng" render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>経度（Longitude）</FormLabel>
+                    <FormControl><Input type="number" step="any" placeholder="例：130.6877" {...field} /></FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )} />
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Googleマップで場所を右クリック →「この場所について」で緯度・経度を確認できます
+              </p>
+            </div>
+
             <div className="grid gap-4 sm:grid-cols-2">
               <FormField control={form.control} name="order" render={({ field }) => (
                 <FormItem>

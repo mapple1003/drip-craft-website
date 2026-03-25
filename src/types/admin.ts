@@ -77,6 +77,8 @@ export type SpotDoc = {
   imageUrl?: string;
   imageUrls?: string[];
   images?: { url: string; caption?: string }[];
+  lat?: number;
+  lng?: number;
   active: boolean;
   order: number;
   createdAt: Date;
