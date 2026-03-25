@@ -157,11 +157,14 @@ function CollectionContent() {
               {isSharedView ? "SHARED COLLECTION" : "MY COLLECTION"}
             </span>
           </div>
-          <h1 className="text-2xl font-bold text-foreground">山鹿名所スタンプ帳</h1>
+          <h1 className="text-2xl font-bold text-foreground">
+            山鹿名所スタンプ帳
+            <span className="ml-2 text-base font-normal text-muted-foreground">Yamaga Spot Stamp Book</span>
+          </h1>
           <p className="mt-1 text-sm text-muted-foreground">
             {isSharedView
-              ? "友達のコレクションです"
-              : "ドリップバッグのQRコードを読み込んで名所を集めよう"}
+              ? "友達のコレクションです / A friend's collection"
+              : "ドリップバッグのQRを読み込んで名所を集めよう / Scan QR codes to collect spots"}
           </p>
         </div>
 
@@ -177,7 +180,7 @@ function CollectionContent() {
                 <span className="text-base font-normal text-muted-foreground"> / {total}</span>
               </div>
               <div className="flex items-center justify-center gap-1.5 text-xs font-medium" style={{ color: "#693c85" }}>
-                <span>🎫</span> コレクター
+                <span>🎫</span> コレクター / Collector
               </div>
             </div>
             <div
@@ -189,7 +192,7 @@ function CollectionContent() {
                 <span className="text-base font-normal text-muted-foreground"> / {total}</span>
               </div>
               <div className="flex items-center justify-center gap-1.5 text-xs font-medium" style={{ color: "#539d84" }}>
-                <span>🗺️</span> 探訪者
+                <span>🗺️</span> 探訪者 / Explorer
               </div>
             </div>
           </div>
@@ -199,7 +202,7 @@ function CollectionContent() {
         {!loading && total > 0 && (
           <div className="mb-8 flex flex-col gap-2">
             <div className="flex justify-between text-xs text-muted-foreground">
-              <span>🎫 コレクト進捗</span>
+              <span>🎫 コレクト進捗 / Collected</span>
               <span>{Math.round((scannedCount / total) * 100)}%</span>
             </div>
             <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
@@ -209,7 +212,7 @@ function CollectionContent() {
               />
             </div>
             <div className="flex justify-between text-xs text-muted-foreground">
-              <span>🗺️ 訪問進捗</span>
+              <span>🗺️ 訪問進捗 / Visited</span>
               <span>{Math.round((visitedCount / total) * 100)}%</span>
             </div>
             <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
@@ -231,7 +234,7 @@ function CollectionContent() {
             {copied ? (
               <><Check size={16} />URLをコピーしました！</>
             ) : (
-              <><Share2 size={16} />コレクションをシェアする</>
+              <><Share2 size={16} />コレクションをシェアする / Share My Collection</>
             )}
           </button>
         )}
@@ -241,7 +244,7 @@ function CollectionContent() {
           <div className="mb-8">
             <div className="mb-2 flex items-center gap-2 text-sm font-medium text-foreground">
               <MapPin size={14} className="text-primary" />
-              名所マップ
+              <span>名所マップ <span className="font-normal text-muted-foreground">/ Spot Map</span></span>
             </div>
             <div className="overflow-hidden rounded-2xl border border-border shadow-sm" style={{ height: 280 }}>
               <SpotMap lat={mapCenter.lat} lng={mapCenter.lng} name="山鹿" spots={mapSpots} />
@@ -266,7 +269,7 @@ function CollectionContent() {
         {/* Stamp grid */}
         <div className="mb-4 flex items-center gap-2 text-sm font-medium text-foreground">
           <Trophy size={14} className="text-primary" />
-          スタンプ一覧
+          <span>スタンプ一覧 <span className="font-normal text-muted-foreground">/ Stamp List</span></span>
         </div>
 
         {loading ? (
@@ -339,6 +342,7 @@ function CollectionContent() {
           <div className="mt-8 rounded-2xl p-6 text-center" style={{ background: "oklch(0.60 0.09 162 / 0.10)" }}>
             <div className="mb-2 text-4xl">🏆</div>
             <p className="font-bold text-foreground">全制覇おめでとうございます！</p>
+            <p className="text-sm font-medium text-muted-foreground">Congratulations! All spots collected!</p>
             <p className="mt-1 text-sm text-muted-foreground">すべての名所を収集・訪問しました</p>
           </div>
         )}
