@@ -157,14 +157,13 @@ function CollectionContent() {
               {isSharedView ? "SHARED COLLECTION" : "MY COLLECTION"}
             </span>
           </div>
-          <h1 className="text-2xl font-bold text-foreground">
-            山鹿名所スタンプ帳
-            <span className="ml-2 text-base font-normal text-muted-foreground">Yamaga Spot Stamp Book</span>
-          </h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            {isSharedView
-              ? "友達のコレクションです / A friend's collection"
-              : "ドリップバッグのQRを読み込んで名所を集めよう / Scan QR codes to collect spots"}
+          <h1 className="text-2xl font-bold text-foreground">山鹿名所スタンプ帳</h1>
+          <p className="text-sm text-muted-foreground">Yamaga Spot Stamp Book</p>
+          <p className="mt-2 text-sm text-muted-foreground">
+            {isSharedView ? "友達のコレクションです" : "ドリップバッグのQRを読み込んで名所を集めよう"}
+          </p>
+          <p className="text-xs text-muted-foreground/70">
+            {isSharedView ? "A friend's collection" : "Scan QR codes to collect spots"}
           </p>
         </div>
 
@@ -179,8 +178,9 @@ function CollectionContent() {
                 {scannedCount}
                 <span className="text-base font-normal text-muted-foreground"> / {total}</span>
               </div>
-              <div className="flex items-center justify-center gap-1.5 text-xs font-medium" style={{ color: "#693c85" }}>
-                <span>🎫</span> コレクター / Collector
+              <div className="text-xs font-medium" style={{ color: "#693c85" }}>
+                <div className="flex items-center justify-center gap-1"><span>🎫</span> コレクター</div>
+                <div className="opacity-70">Collector</div>
               </div>
             </div>
             <div
@@ -191,8 +191,9 @@ function CollectionContent() {
                 {visitedCount}
                 <span className="text-base font-normal text-muted-foreground"> / {total}</span>
               </div>
-              <div className="flex items-center justify-center gap-1.5 text-xs font-medium" style={{ color: "#539d84" }}>
-                <span>🗺️</span> 探訪者 / Explorer
+              <div className="text-xs font-medium" style={{ color: "#539d84" }}>
+                <div className="flex items-center justify-center gap-1"><span>🗺️</span> 探訪者</div>
+                <div className="opacity-70">Explorer</div>
               </div>
             </div>
           </div>
@@ -202,7 +203,7 @@ function CollectionContent() {
         {!loading && total > 0 && (
           <div className="mb-8 flex flex-col gap-2">
             <div className="flex justify-between text-xs text-muted-foreground">
-              <span>🎫 コレクト進捗 / Collected</span>
+              <span>🎫 コレクト進捗<br /><span className="opacity-70">Collected</span></span>
               <span>{Math.round((scannedCount / total) * 100)}%</span>
             </div>
             <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
@@ -212,7 +213,7 @@ function CollectionContent() {
               />
             </div>
             <div className="flex justify-between text-xs text-muted-foreground">
-              <span>🗺️ 訪問進捗 / Visited</span>
+              <span>🗺️ 訪問進捗<br /><span className="opacity-70">Visited</span></span>
               <span>{Math.round((visitedCount / total) * 100)}%</span>
             </div>
             <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
@@ -232,9 +233,12 @@ function CollectionContent() {
             style={{ background: copied ? "#539d84" : "#693c85" }}
           >
             {copied ? (
-              <><Check size={16} />URLをコピーしました！</>
+              <span className="flex items-center gap-2"><Check size={16} />URLをコピーしました！ Copied!</span>
             ) : (
-              <><Share2 size={16} />コレクションをシェアする / Share My Collection</>
+              <span className="flex flex-col items-center gap-0.5">
+              <span className="flex items-center gap-2"><Share2 size={16} />コレクションをシェアする</span>
+              <span className="text-xs font-normal opacity-80">Share My Collection</span>
+            </span>
             )}
           </button>
         )}
@@ -244,7 +248,7 @@ function CollectionContent() {
           <div className="mb-8">
             <div className="mb-2 flex items-center gap-2 text-sm font-medium text-foreground">
               <MapPin size={14} className="text-primary" />
-              <span>名所マップ <span className="font-normal text-muted-foreground">/ Spot Map</span></span>
+              <span>名所マップ<br /><span className="text-xs font-normal text-muted-foreground">Spot Map</span></span>
             </div>
             <div className="overflow-hidden rounded-2xl border border-border shadow-sm" style={{ height: 280 }}>
               <SpotMap lat={mapCenter.lat} lng={mapCenter.lng} name="山鹿" spots={mapSpots} />
@@ -269,7 +273,7 @@ function CollectionContent() {
         {/* Stamp grid */}
         <div className="mb-4 flex items-center gap-2 text-sm font-medium text-foreground">
           <Trophy size={14} className="text-primary" />
-          <span>スタンプ一覧 <span className="font-normal text-muted-foreground">/ Stamp List</span></span>
+          <span>スタンプ一覧<br /><span className="text-xs font-normal text-muted-foreground">Stamp List</span></span>
         </div>
 
         {loading ? (

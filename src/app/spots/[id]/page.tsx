@@ -305,7 +305,10 @@ export default function SpotPage() {
                 className="flex items-center justify-center gap-2 rounded-full border border-border bg-white py-3 text-sm font-medium text-foreground shadow-sm hover:border-primary/50 hover:text-primary transition-colors"
               >
                 <Navigation size={16} />
-                Googleマップで案内する / Open in Google Maps
+                <span className="flex flex-col items-start">
+                  <span>Googleマップで案内する</span>
+                  <span className="text-xs font-normal opacity-80">Open in Google Maps</span>
+                </span>
               </a>
             )}
 
@@ -315,10 +318,14 @@ export default function SpotPage() {
                 <p className="text-sm font-semibold text-foreground">🗺️ 訪問チェックイン</p>
                 <p className="text-xs text-muted-foreground">Visit Check-in</p>
               </div>
+
               {isVisited ? (
                 <div className="flex items-center gap-2 text-sm font-medium" style={{ color: "#539d84" }}>
                   <CheckCircle2 size={16} />
-                  <span>訪問済みです！探訪者トロフィー獲得 <span className="font-normal opacity-70">/ Explorer Trophy Unlocked</span></span>
+                  <span className="flex flex-col">
+                    <span>訪問済みです！探訪者トロフィー獲得</span>
+                    <span className="text-xs font-normal opacity-70">Explorer Trophy Unlocked</span>
+                  </span>
                 </div>
               ) : (
                 <div className="flex flex-col gap-2">
@@ -330,9 +337,9 @@ export default function SpotPage() {
                       style={{ background: "#539d84" }}
                     >
                       {gpsLoading ? (
-                        <><Loader2 size={16} className="animate-spin" />位置情報を取得中... / Getting location...</>
+                        <><Loader2 size={16} className="animate-spin" /><span className="flex flex-col items-start"><span>位置情報を取得中...</span><span className="text-xs font-normal opacity-80">Getting location...</span></span></>
                       ) : (
-                        <><Navigation size={16} />GPS チェックイン / GPS Check-in ({GPS_THRESHOLD_METERS}m)</>
+                        <><Navigation size={16} /><span className="flex flex-col items-start"><span>GPS チェックイン ({GPS_THRESHOLD_METERS}m)</span><span className="text-xs font-normal opacity-80">GPS Check-in</span></span></>
                       )}
                     </button>
                   )}
@@ -341,7 +348,10 @@ export default function SpotPage() {
                     className="flex items-center justify-center gap-2 rounded-full border border-border py-3 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
                   >
                     <CheckCircle2 size={16} />
-                    手動で訪問済みにする / Mark as Visited
+                    <span className="flex flex-col items-start">
+                      <span>手動で訪問済みにする</span>
+                      <span className="text-xs font-normal">Mark as Visited</span>
+                    </span>
                   </button>
                   {gpsError && (
                     <p className="text-xs text-destructive leading-relaxed">{gpsError}</p>
@@ -379,19 +389,19 @@ export default function SpotPage() {
             style={{ background: "#693c85" }}
           >
             <BookOpen size={16} />
-            {lang === "ja" && "自分のコレクションを見る / View My Collection"}
+            {lang === "ja" && <span className="flex flex-col items-center"><span>自分のコレクションを見る</span><span className="text-xs font-normal opacity-80">View My Collection</span></span>}
             {lang === "en" && "View My Collection"}
-            {lang === "zh" && "查看我的收藏 / View My Collection"}
-            {lang === "ko" && "내 컬렉션 보기 / View My Collection"}
+            {lang === "zh" && <span className="flex flex-col items-center"><span>查看我的收藏</span><span className="text-xs font-normal opacity-80">View My Collection</span></span>}
+            {lang === "ko" && <span className="flex flex-col items-center"><span>내 컬렉션 보기</span><span className="text-xs font-normal opacity-80">View My Collection</span></span>}
           </Link>
           <Link
             href="/"
             className="text-sm text-primary underline underline-offset-4 hover:text-primary/80"
           >
-            {lang === "ja" && "EKIREIのコーヒーをもっと見る / Explore More EKIREI Coffees"}
+            {lang === "ja" && <span>EKIREIのコーヒーをもっと見る<br /><span className="text-xs">Explore More EKIREI Coffees</span></span>}
             {lang === "en" && "Explore More EKIREI Coffees"}
-            {lang === "zh" && "查看更多EKIREI咖啡 / Explore More"}
-            {lang === "ko" && "EKIREI 커피 더 보기 / Explore More"}
+            {lang === "zh" && <span>查看更多EKIREI咖啡<br /><span className="text-xs">Explore More</span></span>}
+            {lang === "ko" && <span>EKIREI 커피 더 보기<br /><span className="text-xs">Explore More</span></span>}
           </Link>
         </div>
       </main>

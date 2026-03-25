@@ -71,13 +71,15 @@ export function TrophyOverlay({ type, spotName, onClose }: Props) {
             style={{ background: info.color }}
             onClick={onClose}
           >
-            コレクションを見る / View Collection
+            コレクションを見る
+            <span className="block text-xs font-normal opacity-80">View Collection</span>
           </Link>
           <button
             onClick={onClose}
             className="w-full rounded-full border border-border py-3 text-sm font-medium text-muted-foreground hover:text-foreground"
           >
-            閉じる / Close
+            閉じる
+            <span className="block text-xs font-normal">Close</span>
           </button>
         </div>
       </div>
