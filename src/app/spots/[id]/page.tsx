@@ -305,7 +305,7 @@ export default function SpotPage() {
                 className="flex items-center justify-center gap-2 rounded-full border border-border bg-white py-3 text-sm font-medium text-foreground shadow-sm hover:border-primary/50 hover:text-primary transition-colors"
               >
                 <Navigation size={16} />
-                Googleマップで案内する
+                Googleマップで案内する / Open in Google Maps
               </a>
             )}
 
