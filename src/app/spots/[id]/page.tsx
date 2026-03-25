@@ -379,19 +379,19 @@ export default function SpotPage() {
             style={{ background: "#693c85" }}
           >
             <BookOpen size={16} />
-            {lang === "ja" && "自分のコレクションを見る"}
-            {lang === "en" && "View my collection"}
-            {lang === "zh" && "查看我的收藏"}
-            {lang === "ko" && "내 컬렉션 보기"}
+            {lang === "ja" && "自分のコレクションを見る / View My Collection"}
+            {lang === "en" && "View My Collection"}
+            {lang === "zh" && "查看我的收藏 / View My Collection"}
+            {lang === "ko" && "내 컬렉션 보기 / View My Collection"}
           </Link>
           <Link
             href="/"
             className="text-sm text-primary underline underline-offset-4 hover:text-primary/80"
           >
-            {lang === "ja" && "EKIREIのコーヒーをもっと見る"}
-            {lang === "en" && "Explore more EKIREI coffees"}
-            {lang === "zh" && "查看更多EKIREI咖啡"}
-            {lang === "ko" && "EKIREI 커피 더 보기"}
+            {lang === "ja" && "EKIREIのコーヒーをもっと見る / Explore More EKIREI Coffees"}
+            {lang === "en" && "Explore More EKIREI Coffees"}
+            {lang === "zh" && "查看更多EKIREI咖啡 / Explore More"}
+            {lang === "ko" && "EKIREI 커피 더 보기 / Explore More"}
           </Link>
         </div>
       </main>
