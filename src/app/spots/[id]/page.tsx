@@ -298,7 +298,7 @@ export default function SpotPage() {
               className={`mt-5 flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-medium transition-all ${
                 audioState === "playing"
                   ? "bg-primary/10 text-primary border border-primary/40"
-                  : "border border-border bg-background text-muted-foreground hover:border-primary/50 hover:text-primary"
+                  : "bg-[#693c85] text-white hover:opacity-90"
               }`}
             >
               {audioState === "playing" ? (
