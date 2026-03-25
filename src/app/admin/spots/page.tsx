@@ -33,7 +33,7 @@ export default function SpotsPage() {
     }
   };
 
-  const origin = typeof window !== "undefined" ? window.location.origin : "";
+  const origin = "https://www.ekirei219.com";
 
   return (
     <AdminGuard>
