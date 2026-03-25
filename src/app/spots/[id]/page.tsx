@@ -5,9 +5,10 @@ import { useParams, useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { Skeleton } from "@/components/ui/skeleton";
-import { MapPin, Navigation, CheckCircle2, Loader2, BookOpen } from "lucide-react";
+import { MapPin, Navigation, CheckCircle2, Loader2, BookOpen, Volume2, Square } from "lucide-react";
 import { getSpot } from "@/lib/firestore";
 import { markScanned, markVisited, getSpotStatus, distanceMeters } from "@/lib/collection";
+import { useAudioGuide } from "@/hooks/useAudioGuide";
 import type { SpotDoc } from "@/types/admin";
 import { SpotMap } from "@/components/SpotMap";
 import { TrophyOverlay } from "@/components/TrophyOverlay";
@@ -50,6 +51,9 @@ export default function SpotPage() {
   const [isScanned, setIsScanned] = useState(false);
   const [isVisited, setIsVisited] = useState(false);
   const [trophyType, setTrophyType] = useState<TrophyType | null>(null);
+
+  // Audio guide
+  const { state: audioState, speak, stop: stopAudio } = useAudioGuide(lang);
 
   // GPS check-in state
   const [gpsLoading, setGpsLoading] = useState(false);
@@ -286,6 +290,41 @@ export default function SpotPage() {
           <p className="text-base leading-relaxed text-muted-foreground whitespace-pre-wrap">
             {content.description}
           </p>
+
+          {/* Audio guide button */}
+          {audioState !== "unsupported" && (
+            <button
+              onClick={() => audioState === "playing" ? stopAudio() : speak(content.description || content.name)}
+              className={`mt-5 flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-medium transition-all ${
+                audioState === "playing"
+                  ? "bg-primary/10 text-primary border border-primary/40"
+                  : "border border-border bg-background text-muted-foreground hover:border-primary/50 hover:text-primary"
+              }`}
+            >
+              {audioState === "playing" ? (
+                <>
+                  <Square size={14} className="fill-current" />
+                  <span className="flex flex-col items-start leading-tight">
+                    <span>音声ガイドを停止</span>
+                    <span className="text-xs opacity-70">Stop Audio Guide</span>
+                  </span>
+                  <span className="ml-1 flex gap-0.5">
+                    <span className="inline-block h-3 w-0.5 animate-[bounce_0.6s_ease-in-out_infinite] bg-current" style={{ animationDelay: "0ms" }} />
+                    <span className="inline-block h-3 w-0.5 animate-[bounce_0.6s_ease-in-out_infinite] bg-current" style={{ animationDelay: "150ms" }} />
+                    <span className="inline-block h-3 w-0.5 animate-[bounce_0.6s_ease-in-out_infinite] bg-current" style={{ animationDelay: "300ms" }} />
+                  </span>
+                </>
+              ) : (
+                <>
+                  <Volume2 size={14} />
+                  <span className="flex flex-col items-start leading-tight">
+                    <span>音声ガイドを聴く</span>
+                    <span className="text-xs opacity-70">Listen to Audio Guide</span>
+                  </span>
+                </>
+              )}
+            </button>
+          )}
         </div>
 
         {/* Map & Check-in section */}
