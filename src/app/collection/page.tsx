@@ -331,8 +331,9 @@ function CollectionContent() {
                 </div>
               );
 
-              // In shared view, cards are not clickable (no spoilers for uncollected spots)
-              return isSharedView ? (
+              // Locked pages: only scanned spots are clickable
+              // In shared view, no cards are clickable
+              return isSharedView || !scanned ? (
                 <div key={spot.id}>{card}</div>
               ) : (
                 <Link key={spot.id} href={`/spots/${spot.id}`}>{card}</Link>

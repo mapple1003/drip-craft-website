@@ -51,6 +51,8 @@ export default function SpotPage() {
   const [isScanned, setIsScanned] = useState(false);
   const [isVisited, setIsVisited] = useState(false);
   const [trophyType, setTrophyType] = useState<TrophyType | null>(null);
+  // null = still determining, true = locked (not scanned), false = unlocked
+  const [locked, setLocked] = useState<boolean | null>(null);
 
   // Audio guide
   const { state: audioState, speak, stop: stopAudio } = useAudioGuide(lang);
@@ -59,7 +61,7 @@ export default function SpotPage() {
   const [gpsLoading, setGpsLoading] = useState(false);
   const [gpsError, setGpsError] = useState<string | null>(null);
 
-  // On mount: mark scanned only when arriving via QR code (?scan=1)
+  // On mount: determine lock status and handle QR scan trophy
   // NOTE: Use window.location.search (not useSearchParams) to avoid stale params
   // when navigating between /spots/[id] routes — Next.js reuses the component,
   // causing useSearchParams to momentarily return the previous page's scan=1.
@@ -70,12 +72,20 @@ export default function SpotPage() {
     setIsScanned(status.scanned);
     setIsVisited(status.visited);
 
-    if (isQrScan) {
+    if (status.scanned) {
+      // Already unlocked from a previous QR scan — always accessible
+      setLocked(false);
+    } else if (isQrScan) {
+      // First-time QR scan: unlock and award collector trophy
       const { isNew } = markScanned(id);
       if (isNew) {
         setTimeout(() => setTrophyType("collector"), 600);
         setIsScanned(true);
       }
+      setLocked(false);
+    } else {
+      // Not scanned and no QR code — page is locked
+      setLocked(true);
     }
   }, [id]);
 
@@ -137,7 +147,7 @@ export default function SpotPage() {
       ? `https://www.google.com/maps/dir/?api=1&destination=${spot.lat},${spot.lng}`
       : null;
 
-  if (loading) {
+  if (loading || locked === null) {
     return (
       <div className="min-h-screen bg-background">
         <div className="mx-auto max-w-lg px-6 py-12">
@@ -147,6 +157,39 @@ export default function SpotPage() {
           <Skeleton className="h-4 w-full" />
           <Skeleton className="mt-2 h-4 w-5/6" />
         </div>
+      </div>
+    );
+  }
+
+  // Locked: user has not scanned the QR code for this spot yet
+  if (locked) {
+    return (
+      <div className="min-h-screen bg-background">
+        <header className="border-b border-border bg-background/90 backdrop-blur-sm">
+          <div className="mx-auto flex max-w-lg items-center justify-between px-6 py-4">
+            <Link href="/" className="text-lg font-bold tracking-widest text-primary">
+              EKIREI
+            </Link>
+          </div>
+        </header>
+        <main className="mx-auto max-w-lg px-6 py-20 text-center">
+          <div className="mb-6 text-6xl">🔒</div>
+          <h1 className="mb-3 text-xl font-bold text-foreground">このページはロックされています</h1>
+          <p className="text-sm font-medium text-muted-foreground">This page is locked</p>
+          <p className="mt-6 text-sm leading-relaxed text-muted-foreground">
+            EKIREIのドリップバッグに印刷された<br />
+            QRコードを読み取ると解放されます。
+          </p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Scan the QR code on your EKIREI drip bag to unlock.
+          </p>
+          <Link
+            href="/"
+            className="mt-10 inline-flex items-center gap-2 rounded-full border border-border px-5 py-2.5 text-sm font-medium text-muted-foreground hover:text-primary hover:border-primary/50 transition-colors"
+          >
+            EKIREIのコーヒーを見る
+          </Link>
+        </main>
       </div>
     );
   }
