@@ -59,17 +59,23 @@ export default function SpotPage() {
   const [gpsLoading, setGpsLoading] = useState(false);
   const [gpsError, setGpsError] = useState<string | null>(null);
 
-  // On mount: mark scanned and load status
+  // On mount: mark scanned only when arriving via QR code (?scan=1)
   useEffect(() => {
-    const { isNew } = markScanned(id);
+    const isQrScan = searchParams.get("scan") === "1";
     const status = getSpotStatus(id);
     setIsScanned(status.scanned);
     setIsVisited(status.visited);
-    if (isNew) {
-      // Show trophy after short delay so page renders first
-      setTimeout(() => setTrophyType("collector"), 600);
+
+    if (isQrScan) {
+      const { isNew } = markScanned(id);
+      if (isNew) {
+        // Show trophy after short delay so page renders first
+        setTimeout(() => setTrophyType("collector"), 600);
+        // Update scanned state after marking
+        setIsScanned(true);
+      }
     }
-  }, [id]);
+  }, [id, searchParams]);
 
   useEffect(() => {
     getSpot(id)

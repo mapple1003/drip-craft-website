@@ -68,7 +68,7 @@ export default function SpotsPage() {
           ) : (
             <div className="flex flex-col gap-4">
               {spots.map((spot) => {
-                const url = `${origin}/spots/${spot.id}`;
+                const url = `${origin}/spots/${spot.id}?scan=1`;
                 const langs = [
                   spot.nameEn && "EN",
                   spot.nameZh && "ZH",
