@@ -60,8 +60,12 @@ export default function SpotPage() {
   const [gpsError, setGpsError] = useState<string | null>(null);
 
   // On mount: mark scanned only when arriving via QR code (?scan=1)
+  // NOTE: Use window.location.search (not useSearchParams) to avoid stale params
+  // when navigating between /spots/[id] routes — Next.js reuses the component,
+  // causing useSearchParams to momentarily return the previous page's scan=1.
   useEffect(() => {
-    const isQrScan = searchParams.get("scan") === "1";
+    const urlParams = new URLSearchParams(window.location.search);
+    const isQrScan = urlParams.get("scan") === "1";
     const status = getSpotStatus(id);
     setIsScanned(status.scanned);
     setIsVisited(status.visited);
@@ -69,13 +73,11 @@ export default function SpotPage() {
     if (isQrScan) {
       const { isNew } = markScanned(id);
       if (isNew) {
-        // Show trophy after short delay so page renders first
         setTimeout(() => setTrophyType("collector"), 600);
-        // Update scanned state after marking
         setIsScanned(true);
       }
     }
-  }, [id, searchParams]);
+  }, [id]);
 
   useEffect(() => {
     getSpot(id)
