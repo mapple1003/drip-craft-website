@@ -62,12 +62,21 @@ export default function SpotPage() {
   const [gpsError, setGpsError] = useState<string | null>(null);
 
   // On mount: determine lock status and handle QR scan trophy
+  // Detection strategy:
+  //   1. ?scan=1 in URL → explicit QR scan signal (new bags)
+  //   2. No referrer / external referrer → QR scanner or direct URL (old bags without ?scan=1)
+  //   3. Referrer is our own site → internal navigation (collection, etc.) → respect lock
   // NOTE: Use window.location.search (not useSearchParams) to avoid stale params
-  // when navigating between /spots/[id] routes — Next.js reuses the component,
-  // causing useSearchParams to momentarily return the previous page's scan=1.
+  // when navigating between /spots/[id] routes — Next.js reuses the component.
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
-    const isQrScan = urlParams.get("scan") === "1";
+    const hasQrParam = urlParams.get("scan") === "1";
+    // External visit = no referrer, or referrer from a different domain (QR scanner app)
+    const isExternalVisit =
+      !document.referrer ||
+      !document.referrer.includes(window.location.hostname);
+    const isQrScan = hasQrParam || isExternalVisit;
+
     const status = getSpotStatus(id);
     setIsScanned(status.scanned);
     setIsVisited(status.visited);
@@ -84,7 +93,7 @@ export default function SpotPage() {
       }
       setLocked(false);
     } else {
-      // Not scanned and no QR code — page is locked
+      // Internal navigation to unscanned spot — page is locked
       setLocked(true);
     }
   }, [id]);
