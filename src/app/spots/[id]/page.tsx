@@ -140,7 +140,7 @@ export default function SpotPage() {
       (err) => {
         if (err.code === 1) {
           setGpsError(
-            "【iPhoneの場合】設定 → プライバシーとセキュリティ → 位置情報サービス → Safari → 「このWebサイトの確認中」を選択\n\n【Androidの場合】ブラウザのアドレスバー横の🔒アイコン → 位置情報 → 許可\n\nLocation access denied. Please enable location in device settings."
+            "位置情報の許可が必要です。\n\n【iPhone Chrome】設定 → Chrome → 位置情報 → 「このAppの使用中のみ許可」\n【iPhone Safari】設定 → プライバシーとセキュリティ → 位置情報サービス → Safari\n【Android】ブラウザのアドレスバー横の🔒 → 位置情報 → 許可\n\nPlease allow location access in Settings → Chrome → Location."
           );
         } else if (err.code === 2) {
           setGpsError("位置情報を取得できませんでした。屋外に出て再試行してください。\nCould not get location. Please try outdoors.");
