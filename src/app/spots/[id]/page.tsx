@@ -137,8 +137,16 @@ export default function SpotPage() {
         }
         setGpsLoading(false);
       },
-      () => {
-        setGpsError("位置情報の取得に失敗しました。設定を確認してください。");
+      (err) => {
+        if (err.code === 1) {
+          setGpsError(
+            "【iPhoneの場合】設定 → プライバシーとセキュリティ → 位置情報サービス → Safari → 「このWebサイトの確認中」を選択\n\n【Androidの場合】ブラウザのアドレスバー横の🔒アイコン → 位置情報 → 許可\n\nLocation access denied. Please enable location in device settings."
+          );
+        } else if (err.code === 2) {
+          setGpsError("位置情報を取得できませんでした。屋外に出て再試行してください。\nCould not get location. Please try outdoors.");
+        } else {
+          setGpsError("位置情報の取得がタイムアウトしました。再試行してください。\nLocation timed out. Please try again.");
+        }
         setGpsLoading(false);
       },
       { enableHighAccuracy: true, timeout: 10000 }
