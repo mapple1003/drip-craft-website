@@ -168,8 +168,9 @@ export function SpotForm({ spot }: { spot?: SpotDoc }) {
         toast.success("名所を追加しました");
       }
       router.push("/admin/spots");
-    } catch {
-      toast.error("保存に失敗しました");
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      toast.error(`保存に失敗しました: ${msg}`);
     } finally {
       setIsPending(false);
     }
