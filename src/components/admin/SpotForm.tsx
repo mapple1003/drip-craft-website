@@ -366,7 +366,7 @@ export function SpotForm({ spot }: { spot?: SpotDoc }) {
                     <input
                       type="checkbox"
                       checked={field.value}
-                      onChange={field.onChange}
+                      onChange={(e) => field.onChange(e.target.checked)}
                       className="h-4 w-4 accent-[#693c85]"
                     />
                   </FormControl>
