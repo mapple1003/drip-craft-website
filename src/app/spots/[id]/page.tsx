@@ -469,24 +469,81 @@ export default function SpotPage() {
           </div>
         )}
 
-        {/* Coffee pairing note */}
-        <div
-          className="rounded-2xl p-5 text-sm leading-relaxed"
-          style={{ background: "oklch(0.60 0.09 162 / 0.08)" }}
-        >
-          <p className="mb-1 font-semibold text-primary">
-            {lang === "ja" && "このコーヒーについて"}
-            {lang === "en" && "About this coffee"}
-            {lang === "zh" && "关于这款咖啡"}
-            {lang === "ko" && "이 커피에 대해"}
-          </p>
-          <p className="text-muted-foreground">
-            {lang === "ja" && "このドリップバッグは、熊本の風景や文化からインスピレーションを受けたEKIREIオリジナルブレンドです。"}
-            {lang === "en" && "This drip bag is an EKIREI original blend inspired by the landscapes and culture of Kumamoto."}
-            {lang === "zh" && "这款滴滤咖啡包是受熊本风景与文化启发而创作的EKIREI原创拼配咖啡。"}
-            {lang === "ko" && "이 드립백은 구마모토의 풍경과 문화에서 영감을 받아 만든 EKIREI 오리지널 블렌드입니다."}
-          </p>
-        </div>
+        {/* Intro guide (shown instead of coffee note for isIntro spots) */}
+        {spot.isIntro ? (
+          <div className="flex flex-col gap-3">
+            {[
+              {
+                icon: "🎫",
+                color: "#693c85",
+                title: lang === "ja" ? "QRコードを読み取る" : lang === "en" ? "Scan a QR Code" : lang === "zh" ? "扫描二维码" : "QR코드 스캔",
+                body: lang === "ja"
+                  ? "各ドリップバッグの帯についているQRコードを読み取ると、その名所のコレクターバッジを獲得できます。"
+                  : lang === "en"
+                  ? "Scan the QR code on each drip bag to unlock the Collector badge for that spot."
+                  : lang === "zh"
+                  ? "扫描每个滴滤袋上的二维码，即可获得该景点的收藏徽章。"
+                  : "각 드립백의 QR코드를 스캔하면 해당 명소의 콜렉터 배지를 획득할 수 있습니다.",
+              },
+              {
+                icon: "🗺️",
+                color: "#539d84",
+                title: lang === "ja" ? "現地を訪問する" : lang === "en" ? "Visit in Person" : lang === "zh" ? "实地探访" : "현지 방문",
+                body: lang === "ja"
+                  ? "GPSチェックインまたは手動チェックインで現地を訪問すると、探訪者バッジを獲得できます。"
+                  : lang === "en"
+                  ? "Check in via GPS or manual confirmation when you visit the location to earn the Explorer badge."
+                  : lang === "zh"
+                  ? "在景点现场进行GPS签到或手动打卡，即可获得探访者徽章。"
+                  : "GPS 체크인 또는 수동 체크인으로 현지를 방문하면 탐방자 배지를 획득할 수 있습니다.",
+              },
+              {
+                icon: "📖",
+                color: "#693c85",
+                title: lang === "ja" ? "コレクションを集める" : lang === "en" ? "Build Your Collection" : lang === "zh" ? "收集名所" : "컬렉션 모으기",
+                body: lang === "ja"
+                  ? "スタンプ帳ページでコレクションの進捗を確認できます。全制覇を目指しましょう！"
+                  : lang === "en"
+                  ? "Track your progress on the Stamp Book page. Aim to collect them all!"
+                  : lang === "zh"
+                  ? "在集章页面查看收集进度，挑战全制覆吧！"
+                  : "스탬프 북 페이지에서 컬렉션 진행 상황을 확인하세요. 전부 모아보세요!",
+              },
+            ].map(({ icon, color, title, body }) => (
+              <div key={icon} className="flex gap-3 rounded-2xl border border-border bg-card p-4 shadow-sm">
+                <div
+                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-lg"
+                  style={{ background: `${color}18` }}
+                >
+                  {icon}
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-foreground">{title}</p>
+                  <p className="mt-0.5 text-xs leading-relaxed text-muted-foreground">{body}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          /* Coffee pairing note */
+          <div
+            className="rounded-2xl p-5 text-sm leading-relaxed"
+            style={{ background: "oklch(0.60 0.09 162 / 0.08)" }}
+          >
+            <p className="mb-1 font-semibold text-primary">
+              {lang === "ja" && "このコーヒーについて"}
+              {lang === "en" && "About this coffee"}
+              {lang === "zh" && "关于这款咖啡"}
+              {lang === "ko" && "이 커피에 대해"}
+            </p>
+            <p className="text-muted-foreground">
+              {lang === "ja" && "このドリップバッグは、熊本の風景や文化からインスピレーションを受けたEKIREIオリジナルブレンドです。"}
+              {lang === "en" && "This drip bag is an EKIREI original blend inspired by the landscapes and culture of Kumamoto."}
+              {lang === "zh" && "这款滴滤咖啡包是受熊本风景与文化启发而创作的EKIREI原创拼配咖啡。"}
+              {lang === "ko" && "이 드립백은 구마모토의 풍경과 문화에서 영감을 받아 만든 EKIREI 오리지널 블렌드입니다."}
+            </p>
+          </div>
+        )}
 
         {/* Footer */}
         <div className="mt-10 flex flex-col items-center gap-3 text-center">

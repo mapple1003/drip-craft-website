@@ -31,6 +31,7 @@ const spotSchema = z.object({
   lng: z.string().optional(),
   order: z.string(),
   active: z.boolean(),
+  isIntro: z.boolean(),
 });
 
 type SpotFormValues = z.infer<typeof spotSchema>;
@@ -98,6 +99,7 @@ export function SpotForm({ spot }: { spot?: SpotDoc }) {
       lng: spot?.lng != null ? String(spot.lng) : "",
       order: String(spot?.order ?? 0),
       active: spot?.active ?? true,
+      isIntro: spot?.isIntro ?? false,
     },
   });
 
@@ -156,6 +158,7 @@ export function SpotForm({ spot }: { spot?: SpotDoc }) {
         lng: data.lng ? Number(data.lng) : undefined,
         order: Number(data.order),
         active: data.active,
+        isIntro: data.isIntro,
       };
       if (isEdit) {
         await updateSpot(spot.id, payload);
@@ -354,6 +357,30 @@ export function SpotForm({ spot }: { spot?: SpotDoc }) {
                 </FormItem>
               )} />
             </div>
+
+            {/* Intro page flag */}
+            <FormField control={form.control} name="isIntro" render={({ field }) => (
+              <FormItem>
+                <div className="flex items-center gap-3 rounded-xl border border-[#693c85]/30 bg-[#693c85]/5 px-4 py-3">
+                  <FormControl>
+                    <input
+                      type="checkbox"
+                      checked={field.value}
+                      onChange={field.onChange}
+                      className="h-4 w-4 accent-[#693c85]"
+                    />
+                  </FormControl>
+                  <div>
+                    <FormLabel className="cursor-pointer text-sm font-medium text-foreground">
+                      📖 EKIREIシステム紹介ページ
+                    </FormLabel>
+                    <p className="text-xs text-muted-foreground">
+                      ONにすると「コーヒーについて」の代わりにスタンプブックの使い方ガイドを表示します
+                    </p>
+                  </div>
+                </div>
+              </FormItem>
+            )} />
 
             <div className="flex gap-3">
               <Button type="submit" disabled={isPending}>
