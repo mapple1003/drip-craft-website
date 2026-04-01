@@ -96,6 +96,8 @@ function CollectionContent() {
   const scannedCount = spots.filter((s) => s.status.scanned).length;
   const visitedCount = spots.filter((s) => s.status.visited).length;
   const total = spots.length;
+  // Only spots with GPS coordinates can be visited — exclude from explorer denominator
+  const visitableTotal = spots.filter((s) => s.lat && s.lng).length;
 
   const mapSpots = spots
     .filter((s) => s.lat && s.lng)
@@ -189,7 +191,7 @@ function CollectionContent() {
             >
               <div className="mb-1 text-3xl font-bold" style={{ color: "#539d84" }}>
                 {visitedCount}
-                <span className="text-base font-normal text-muted-foreground"> / {total}</span>
+                <span className="text-base font-normal text-muted-foreground"> / {visitableTotal}</span>
               </div>
               <div className="text-xs font-medium" style={{ color: "#539d84" }}>
                 <div className="flex items-center justify-center gap-1"><span>🗺️</span> 探訪者</div>
@@ -214,12 +216,12 @@ function CollectionContent() {
             </div>
             <div className="flex justify-between text-xs text-muted-foreground">
               <span>🗺️ 訪問進捗<br /><span className="opacity-70">Visited</span></span>
-              <span>{Math.round((visitedCount / total) * 100)}%</span>
+              <span>{visitableTotal > 0 ? Math.round((visitedCount / visitableTotal) * 100) : 0}%</span>
             </div>
             <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
               <div
                 className="h-full rounded-full transition-all duration-500"
-                style={{ width: `${(visitedCount / total) * 100}%`, background: "#539d84" }}
+                style={{ width: `${visitableTotal > 0 ? (visitedCount / visitableTotal) * 100 : 0}%`, background: "#539d84" }}
               />
             </div>
           </div>
@@ -343,7 +345,7 @@ function CollectionContent() {
         )}
 
         {/* All collected message */}
-        {!loading && total > 0 && scannedCount === total && visitedCount === total && (
+        {!loading && total > 0 && scannedCount === total && (visitableTotal === 0 || visitedCount === visitableTotal) && (
           <div className="mt-8 rounded-2xl p-6 text-center" style={{ background: "oklch(0.60 0.09 162 / 0.10)" }}>
             <div className="mb-2 text-4xl">🏆</div>
             <p className="font-bold text-foreground">全制覇おめでとうございます！</p>
