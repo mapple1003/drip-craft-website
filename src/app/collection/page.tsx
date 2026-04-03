@@ -94,10 +94,21 @@ function CollectionContent() {
   }, [spots]);
 
   const scannedCount = spots.filter((s) => s.status.scanned).length;
-  const visitedCount = spots.filter((s) => s.status.visited).length;
   const total = spots.length;
-  // Only spots with GPS coordinates can be visited — exclude from explorer denominator
-  const visitableTotal = spots.filter((s) => s.lat && s.lng).length;
+
+  // Count total GPS check-in locations across all spots (each spot can have up to 2)
+  const visitableTotal = spots.reduce((sum, s) => {
+    if (s.locations?.length) return sum + s.locations.length;
+    if (s.lat && s.lng) return sum + 1;
+    return sum;
+  }, 0);
+
+  // Count total visited locations (not just visited spots)
+  const visitedCount = spots.reduce((sum, s) => {
+    if (s.status.visitedLocations?.length) return sum + s.status.visitedLocations.length;
+    if (s.status.visited) return sum + 1; // legacy: no visitedLocations array
+    return sum;
+  }, 0);
 
   const mapSpots = spots
     .filter((s) => s.lat && s.lng)
