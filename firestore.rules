@@ -32,6 +32,12 @@ service cloud.firestore {
       allow write: if request.auth != null;
     }
 
+    // Spot stats: admin can read, anyone can increment counters (aggregate only, no PII)
+    match /spotStats/{spotId} {
+      allow read: if request.auth != null;
+      allow write: if true;
+    }
+
     // Contacts: anyone can create, only authenticated admin can read
     match /contacts/{contactId} {
       allow create: if request.resource.data.keys().hasAll(['name', 'email', 'message', 'createdAt', 'updatedAt'])

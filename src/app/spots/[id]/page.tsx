@@ -8,6 +8,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { MapPin, Navigation, CheckCircle2, Loader2, BookOpen, Volume2, Square } from "lucide-react";
 import { getSpot } from "@/lib/firestore";
 import { markScanned, markVisited, getSpotStatus, distanceMeters } from "@/lib/collection";
+import { incrementScanCount, incrementVisitCount } from "@/lib/stats";
 import { useAudioGuide } from "@/hooks/useAudioGuide";
 import type { SpotDoc } from "@/types/admin";
 import { SpotMap } from "@/components/SpotMap";
@@ -90,6 +91,8 @@ export default function SpotPage() {
       if (isNew) {
         setTimeout(() => setTrophyType("collector"), 600);
         setIsScanned(true);
+        // Record scan in Firestore (fire-and-forget)
+        incrementScanCount(id).catch(() => {});
       }
       setLocked(false);
     } else {
@@ -129,7 +132,10 @@ export default function SpotPage() {
         if (dist <= GPS_THRESHOLD_METERS) {
           const { isNew } = markVisited(id, "gps");
           setIsVisited(true);
-          if (isNew) setTrophyType("explorer");
+          if (isNew) {
+            setTrophyType("explorer");
+            incrementVisitCount(id).catch(() => {});
+          }
         } else {
           setGpsError(
             `現在地から約${Math.round(dist)}m離れています。現地（${GPS_THRESHOLD_METERS}m以内）でチェックインしてください。`
@@ -156,7 +162,10 @@ export default function SpotPage() {
   const handleManualCheckin = useCallback(() => {
     const { isNew } = markVisited(id, "manual");
     setIsVisited(true);
-    if (isNew) setTrophyType("explorer");
+    if (isNew) {
+      setTrophyType("explorer");
+      incrementVisitCount(id).catch(() => {});
+    }
   }, [id]);
 
   const googleMapsUrl =
