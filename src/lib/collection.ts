@@ -4,9 +4,10 @@
 export type SpotStatus = {
   scanned: boolean;
   scannedAt?: string; // ISO string
-  visited: boolean;
+  visited: boolean; // true when all locations are visited
   visitedAt?: string; // ISO string
   visitMethod?: "gps" | "manual";
+  visitedLocations?: number[]; // indices of visited locations
 };
 
 type CollectionData = {
@@ -70,6 +71,40 @@ export function markVisited(
   };
   save(data);
   return { isNew: true };
+}
+
+/**
+ * Mark a specific location index as visited.
+ * Returns isNewLocation=true if this location hadn't been visited before,
+ * and allVisited=true when every location in the spot is now visited.
+ * Explorer trophy should only be shown when allVisited becomes true for the first time.
+ */
+export function markLocationVisited(
+  spotId: string,
+  locationIndex: number,
+  totalLocations: number,
+  method: "gps" | "manual"
+): { isNewLocation: boolean; allVisited: boolean } {
+  const data = load();
+  const existing = data.spots[spotId] ?? { scanned: false, visited: false };
+  const visitedLocations = [...(existing.visitedLocations ?? [])];
+
+  if (visitedLocations.includes(locationIndex)) {
+    return { isNewLocation: false, allVisited: existing.visited };
+  }
+
+  visitedLocations.push(locationIndex);
+  const allVisited = visitedLocations.length >= totalLocations;
+
+  data.spots[spotId] = {
+    ...existing,
+    visited: allVisited,
+    visitedAt: allVisited ? new Date().toISOString() : existing.visitedAt,
+    visitMethod: method,
+    visitedLocations,
+  };
+  save(data);
+  return { isNewLocation: true, allVisited };
 }
 
 /** Haversine formula: distance between two lat/lng in meters */

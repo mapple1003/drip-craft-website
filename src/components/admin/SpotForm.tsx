@@ -16,7 +16,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
-import { Loader2, Sparkles, Plus, Trash2, Upload, MapPin } from "lucide-react";
+import { Loader2, Sparkles, Plus, Trash2, Upload, MapPin, X } from "lucide-react";
 
 const spotSchema = z.object({
   name: z.string().min(1, "入力してください"),
@@ -27,8 +27,6 @@ const spotSchema = z.object({
   descriptionZh: z.string().optional(),
   nameKo: z.string().optional(),
   descriptionKo: z.string().optional(),
-  lat: z.string().optional(),
-  lng: z.string().optional(),
   order: z.string(),
   active: z.boolean(),
   isIntro: z.boolean(),
@@ -37,6 +35,9 @@ const spotSchema = z.object({
 type SpotFormValues = z.infer<typeof spotSchema>;
 
 type StringField = "nameEn" | "descriptionEn" | "nameZh" | "descriptionZh" | "nameKo" | "descriptionKo";
+type LocationEntry = { name: string; lat: string; lng: string };
+
+const MAX_LOCATIONS = 2;
 
 const LANG_FIELDS: { lang: string; flag: string; nameKey: StringField; descKey: StringField }[] = [
   { lang: "English", flag: "🇺🇸", nameKey: "nameEn", descKey: "descriptionEn" },
@@ -64,6 +65,18 @@ export function SpotForm({ spot }: { spot?: SpotDoc }) {
   };
   const [images, setImages] = useState<ImageEntry[]>(initImages);
   const [uploadingIndex, setUploadingIndex] = useState<number | null>(null);
+
+  // Multi-location state: migrate legacy lat/lng to locations array
+  const initLocations = (): LocationEntry[] => {
+    if (spot?.locations?.length) {
+      return spot.locations.map((l) => ({ name: l.name, lat: String(l.lat), lng: String(l.lng) }));
+    }
+    if (spot?.lat != null && spot?.lng != null) {
+      return [{ name: "", lat: String(spot.lat), lng: String(spot.lng) }];
+    }
+    return [];
+  };
+  const [locations, setLocations] = useState<LocationEntry[]>(initLocations);
 
   const handleFileUpload = async (file: File, index: number) => {
     setUploadingIndex(index);
@@ -95,8 +108,6 @@ export function SpotForm({ spot }: { spot?: SpotDoc }) {
       descriptionZh: spot?.descriptionZh ?? "",
       nameKo: spot?.nameKo ?? "",
       descriptionKo: spot?.descriptionKo ?? "",
-      lat: spot?.lat != null ? String(spot.lat) : "",
-      lng: spot?.lng != null ? String(spot.lng) : "",
       order: String(spot?.order ?? 0),
       active: spot?.active ?? true,
       isIntro: spot?.isIntro ?? false,
@@ -154,8 +165,9 @@ export function SpotForm({ spot }: { spot?: SpotDoc }) {
         imageUrl: filteredImages[0]?.url ?? "",
         imageUrls: filteredImages.map((img) => img.url),
         images: filteredImages,
-        ...(data.lat ? { lat: Number(data.lat) } : {}),
-        ...(data.lng ? { lng: Number(data.lng) } : {}),
+        locations: locations
+          .filter((l) => l.lat && l.lng)
+          .map((l) => ({ name: l.name.trim(), lat: Number(l.lat), lng: Number(l.lng) })),
         order: Number(data.order),
         active: data.active,
         isIntro: data.isIntro,
@@ -322,28 +334,67 @@ export function SpotForm({ spot }: { spot?: SpotDoc }) {
               ))}
               <p className="text-xs text-muted-foreground">1枚目がメイン写真になります。</p>
             </div>
-            {/* Location */}
+            {/* Locations (up to 2) */}
             <div className="rounded-xl border border-border bg-muted/30 p-4 flex flex-col gap-3">
-              <div className="flex items-center gap-2 text-sm font-medium">
-                <MapPin size={14} className="text-primary" />
-                <span>位置情報（QRコード地図表示用）</span>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 text-sm font-medium">
+                  <MapPin size={14} className="text-primary" />
+                  <span>チェックイン場所（最大2か所）</span>
+                </div>
+                {locations.length < MAX_LOCATIONS && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setLocations((prev) => [...prev, { name: "", lat: "", lng: "" }])}
+                  >
+                    <Plus size={14} className="mr-1" />場所を追加
+                  </Button>
+                )}
               </div>
-              <div className="grid gap-3 sm:grid-cols-2">
-                <FormField control={form.control} name="lat" render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>緯度（Latitude）</FormLabel>
-                    <FormControl><Input type="number" step="any" placeholder="例：32.9942" {...field} /></FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )} />
-                <FormField control={form.control} name="lng" render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>経度（Longitude）</FormLabel>
-                    <FormControl><Input type="number" step="any" placeholder="例：130.6877" {...field} /></FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )} />
-              </div>
+
+              {locations.length === 0 && (
+                <p className="text-xs text-muted-foreground">場所を追加するとマップ表示とGPSチェックインが有効になります</p>
+              )}
+
+              {locations.map((loc, i) => (
+                <div key={i} className="flex flex-col gap-2 rounded-lg border border-border bg-background p-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-semibold text-muted-foreground">場所 {i + 1}</span>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="h-6 w-6"
+                      onClick={() => setLocations((prev) => prev.filter((_, j) => j !== i))}
+                    >
+                      <X size={12} />
+                    </Button>
+                  </div>
+                  <Input
+                    placeholder="場所の名称（例：石室入口、展示室）"
+                    value={loc.name}
+                    onChange={(e) => setLocations((prev) => prev.map((l, j) => j === i ? { ...l, name: e.target.value } : l))}
+                  />
+                  <div className="grid grid-cols-2 gap-2">
+                    <Input
+                      type="number"
+                      step="any"
+                      placeholder="緯度 例：32.9942"
+                      value={loc.lat}
+                      onChange={(e) => setLocations((prev) => prev.map((l, j) => j === i ? { ...l, lat: e.target.value } : l))}
+                    />
+                    <Input
+                      type="number"
+                      step="any"
+                      placeholder="経度 例：130.6877"
+                      value={loc.lng}
+                      onChange={(e) => setLocations((prev) => prev.map((l, j) => j === i ? { ...l, lng: e.target.value } : l))}
+                    />
+                  </div>
+                </div>
+              ))}
+
               <p className="text-xs text-muted-foreground">
                 Googleマップで場所を右クリック →「この場所について」で緯度・経度を確認できます
               </p>

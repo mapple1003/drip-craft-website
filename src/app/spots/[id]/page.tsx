@@ -7,10 +7,10 @@ import Link from "next/link";
 import { Skeleton } from "@/components/ui/skeleton";
 import { MapPin, Navigation, CheckCircle2, Loader2, BookOpen, Volume2, Square } from "lucide-react";
 import { getSpot } from "@/lib/firestore";
-import { markScanned, markVisited, getSpotStatus, distanceMeters } from "@/lib/collection";
+import { markScanned, markLocationVisited, getSpotStatus, distanceMeters } from "@/lib/collection";
 import { incrementScanCount, incrementVisitCount } from "@/lib/stats";
 import { useAudioGuide } from "@/hooks/useAudioGuide";
-import type { SpotDoc } from "@/types/admin";
+import type { SpotDoc, SpotLocation } from "@/types/admin";
 import { SpotMap } from "@/components/SpotMap";
 import { TrophyOverlay } from "@/components/TrophyOverlay";
 
@@ -50,7 +50,7 @@ export default function SpotPage() {
 
   // Collection state
   const [isScanned, setIsScanned] = useState(false);
-  const [isVisited, setIsVisited] = useState(false);
+  const [visitedLocations, setVisitedLocations] = useState<number[]>([]);
   const [trophyType, setTrophyType] = useState<TrophyType | null>(null);
   // null = still determining, true = locked (not scanned), false = unlocked
   const [locked, setLocked] = useState<boolean | null>(null);
@@ -58,9 +58,9 @@ export default function SpotPage() {
   // Audio guide
   const { state: audioState, speak, stop: stopAudio } = useAudioGuide(lang);
 
-  // GPS check-in state
-  const [gpsLoading, setGpsLoading] = useState(false);
-  const [gpsError, setGpsError] = useState<string | null>(null);
+  // GPS check-in state (per location index)
+  const [gpsLoading, setGpsLoading] = useState<number | null>(null); // locationIndex or null
+  const [gpsErrors, setGpsErrors] = useState<Record<number, string>>({});
 
   // On mount: determine lock status and handle QR scan trophy
   // Detection strategy:
@@ -80,7 +80,7 @@ export default function SpotPage() {
 
     const status = getSpotStatus(id);
     setIsScanned(status.scanned);
-    setIsVisited(status.visited);
+    setVisitedLocations(status.visitedLocations ?? []);
 
     if (status.scanned) {
       // Already unlocked from a previous QR scan — always accessible
@@ -117,61 +117,64 @@ export default function SpotPage() {
     router.replace(`/spots/${id}?${params.toString()}`, { scroll: false });
   };
 
-  const handleGpsCheckin = useCallback(() => {
-    if (!spot?.lat || !spot?.lng) return;
-    setGpsLoading(true);
-    setGpsError(null);
+  // Normalize locations: prefer spot.locations, fall back to legacy lat/lng
+  const spotLocations: SpotLocation[] = spot
+    ? (spot.locations?.length
+        ? spot.locations
+        : spot.lat && spot.lng
+        ? [{ name: "", lat: spot.lat, lng: spot.lng }]
+        : [])
+    : [];
+
+  const totalLocations = spotLocations.length;
+
+  const handleGpsCheckin = useCallback((locationIndex: number, loc: SpotLocation) => {
+    setGpsLoading(locationIndex);
+    setGpsErrors((prev) => ({ ...prev, [locationIndex]: "" }));
     navigator.geolocation.getCurrentPosition(
       (pos) => {
-        const dist = distanceMeters(
-          pos.coords.latitude,
-          pos.coords.longitude,
-          spot.lat!,
-          spot.lng!
-        );
+        const dist = distanceMeters(pos.coords.latitude, pos.coords.longitude, loc.lat, loc.lng);
         if (dist <= GPS_THRESHOLD_METERS) {
-          const { isNew } = markVisited(id, "gps");
-          setIsVisited(true);
-          if (isNew) {
-            setTrophyType("explorer");
-            incrementVisitCount(id).catch(() => {});
+          const { isNewLocation, allVisited } = markLocationVisited(id, locationIndex, totalLocations, "gps");
+          if (isNewLocation) {
+            setVisitedLocations((prev) => [...prev, locationIndex]);
+            if (allVisited) {
+              setTrophyType("explorer");
+              incrementVisitCount(id).catch(() => {});
+            }
           }
         } else {
-          setGpsError(
-            `現在地から約${Math.round(dist)}m離れています。現地（${GPS_THRESHOLD_METERS}m以内）でチェックインしてください。`
-          );
+          setGpsErrors((prev) => ({
+            ...prev,
+            [locationIndex]: `現在地から約${Math.round(dist)}m離れています。現地（${GPS_THRESHOLD_METERS}m以内）でチェックインしてください。`,
+          }));
         }
-        setGpsLoading(false);
+        setGpsLoading(null);
       },
       (err) => {
-        if (err.code === 1) {
-          setGpsError(
-            "位置情報の許可が必要です。\n\n【iPhone Chrome】設定 → Chrome → 位置情報 → 「このAppの使用中のみ許可」\n【iPhone Safari】設定 → プライバシーとセキュリティ → 位置情報サービス → Safari\n【Android】ブラウザのアドレスバー横の🔒 → 位置情報 → 許可\n\nPlease allow location access in Settings → Chrome → Location."
-          );
-        } else if (err.code === 2) {
-          setGpsError("位置情報を取得できませんでした。屋外に出て再試行してください。\nCould not get location. Please try outdoors.");
-        } else {
-          setGpsError("位置情報の取得がタイムアウトしました。再試行してください。\nLocation timed out. Please try again.");
-        }
-        setGpsLoading(false);
+        const msg =
+          err.code === 1
+            ? "位置情報の許可が必要です。\n\n【iPhone Chrome】設定 → Chrome → 位置情報 → 「このAppの使用中のみ許可」\n【iPhone Safari】設定 → プライバシーとセキュリティ → 位置情報サービス → Safari\n【Android】ブラウザのアドレスバー横の🔒 → 位置情報 → 許可\n\nPlease allow location access in Settings → Chrome → Location."
+            : err.code === 2
+            ? "位置情報を取得できませんでした。屋外に出て再試行してください。\nCould not get location. Please try outdoors."
+            : "位置情報の取得がタイムアウトしました。再試行してください。\nLocation timed out. Please try again.";
+        setGpsErrors((prev) => ({ ...prev, [locationIndex]: msg }));
+        setGpsLoading(null);
       },
       { enableHighAccuracy: true, timeout: 10000 }
     );
-  }, [spot, id]);
+  }, [id, totalLocations]);
 
-  const handleManualCheckin = useCallback(() => {
-    const { isNew } = markVisited(id, "manual");
-    setIsVisited(true);
-    if (isNew) {
-      setTrophyType("explorer");
-      incrementVisitCount(id).catch(() => {});
+  const handleManualCheckin = useCallback((locationIndex: number) => {
+    const { isNewLocation, allVisited } = markLocationVisited(id, locationIndex, totalLocations, "manual");
+    if (isNewLocation) {
+      setVisitedLocations((prev) => [...prev, locationIndex]);
+      if (allVisited) {
+        setTrophyType("explorer");
+        incrementVisitCount(id).catch(() => {});
+      }
     }
-  }, [id]);
-
-  const googleMapsUrl =
-    spot?.lat && spot?.lng
-      ? `https://www.google.com/maps/dir/?api=1&destination=${spot.lat},${spot.lng}`
-      : null;
+  }, [id, totalLocations]);
 
   if (loading || locked === null) {
     return (
@@ -272,16 +275,20 @@ export default function SpotPage() {
             <span>🎫</span>
             <span>コレクター</span>
           </div>
-          <div
-            className={`flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium border transition-all ${
-              isVisited
-                ? "border-[#539d84] bg-[#539d84]/10 text-[#539d84]"
-                : "border-border bg-muted/30 text-muted-foreground"
-            }`}
-          >
-            <span>🗺️</span>
-            <span>探訪者</span>
-          </div>
+          {totalLocations > 0 && (
+            <div
+              className={`flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium border transition-all ${
+                visitedLocations.length >= totalLocations
+                  ? "border-[#539d84] bg-[#539d84]/10 text-[#539d84]"
+                  : visitedLocations.length > 0
+                  ? "border-[#539d84]/50 bg-[#539d84]/5 text-[#539d84]/70"
+                  : "border-border bg-muted/30 text-muted-foreground"
+              }`}
+            >
+              <span>🗺️</span>
+              <span>探訪者{totalLocations > 1 ? ` ${visitedLocations.length}/${totalLocations}` : ""}</span>
+            </div>
+          )}
         </div>
 
         {/* Language switcher */}
@@ -405,76 +412,83 @@ export default function SpotPage() {
         </div>
 
         {/* Map & Check-in section */}
-        {spot.lat && spot.lng && (
+        {spotLocations.length > 0 && (
           <div className="mb-8 flex flex-col gap-4">
-            {/* Map */}
+            {/* Map: center on first location */}
             <div className="overflow-hidden rounded-2xl border border-border shadow-sm" style={{ height: 240 }}>
-              <SpotMap lat={spot.lat} lng={spot.lng} name={spot.name} />
+              <SpotMap lat={spotLocations[0].lat} lng={spotLocations[0].lng} name={spot.name} />
             </div>
 
-            {/* Google Maps link */}
-            {googleMapsUrl && (
-              <a
-                href={googleMapsUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center justify-center gap-2 rounded-full border border-border bg-white py-3 text-sm font-medium text-foreground shadow-sm hover:border-primary/50 hover:text-primary transition-colors"
-              >
-                <Navigation size={16} />
-                <span className="flex flex-col items-start">
-                  <span>Googleマップで案内する</span>
-                  <span className="text-xs font-normal opacity-80">Open in Google Maps</span>
-                </span>
-              </a>
-            )}
+            {/* Per-location check-in cards */}
+            {spotLocations.map((loc, i) => {
+              const isLocVisited = visitedLocations.includes(i);
+              const locGpsLoading = gpsLoading === i;
+              const locGpsError = gpsErrors[i];
+              const googleUrl = `https://www.google.com/maps/dir/?api=1&destination=${loc.lat},${loc.lng}`;
+              const locLabel = loc.name || (spotLocations.length > 1 ? `場所 ${i + 1}` : "");
 
-            {/* Check-in card */}
-            <div className="rounded-2xl border border-border bg-muted/20 p-5">
-              <div className="mb-3">
-                <p className="text-sm font-semibold text-foreground">🗺️ 訪問チェックイン</p>
-                <p className="text-xs text-muted-foreground">Visit Check-in</p>
-              </div>
-
-              {isVisited ? (
-                <div className="flex items-center gap-2 text-sm font-medium" style={{ color: "#539d84" }}>
-                  <CheckCircle2 size={16} />
-                  <span className="flex flex-col">
-                    <span>訪問済みです！探訪者トロフィー獲得</span>
-                    <span className="text-xs font-normal opacity-70">Explorer Trophy Unlocked</span>
-                  </span>
-                </div>
-              ) : (
-                <div className="flex flex-col gap-2">
-                  {spot.lat && spot.lng && (
-                    <button
-                      onClick={handleGpsCheckin}
-                      disabled={gpsLoading}
-                      className="flex items-center justify-center gap-2 rounded-full py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-60"
-                      style={{ background: "#539d84" }}
+              return (
+                <div key={i} className="rounded-2xl border border-border bg-muted/20 p-5">
+                  <div className="mb-3 flex items-start justify-between gap-2">
+                    <div>
+                      <p className="text-sm font-semibold text-foreground">
+                        🗺️ {locLabel ? `${locLabel}` : "訪問チェックイン"}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {locLabel ? "Visit Check-in" : "Visit Check-in"}
+                      </p>
+                    </div>
+                    <a
+                      href={googleUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="shrink-0 flex items-center gap-1 rounded-full border border-border bg-white px-3 py-1.5 text-xs font-medium text-muted-foreground hover:text-primary transition-colors"
                     >
-                      {gpsLoading ? (
-                        <><Loader2 size={16} className="animate-spin" /><span className="flex flex-col items-start"><span>位置情報を取得中...</span><span className="text-xs font-normal opacity-80">Getting location...</span></span></>
-                      ) : (
-                        <><Navigation size={16} /><span className="flex flex-col items-start"><span>GPS チェックイン ({GPS_THRESHOLD_METERS}m)</span><span className="text-xs font-normal opacity-80">GPS Check-in</span></span></>
+                      <Navigation size={12} />
+                      <span>地図</span>
+                    </a>
+                  </div>
+
+                  {isLocVisited ? (
+                    <div className="flex items-center gap-2 text-sm font-medium" style={{ color: "#539d84" }}>
+                      <CheckCircle2 size={16} />
+                      <span className="flex flex-col">
+                        <span>訪問済み！</span>
+                        <span className="text-xs font-normal opacity-70">Visited</span>
+                      </span>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col gap-2">
+                      <button
+                        onClick={() => handleGpsCheckin(i, loc)}
+                        disabled={locGpsLoading}
+                        className="flex items-center justify-center gap-2 rounded-full py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-60"
+                        style={{ background: "#539d84" }}
+                      >
+                        {locGpsLoading ? (
+                          <><Loader2 size={16} className="animate-spin" /><span className="flex flex-col items-start"><span>位置情報を取得中...</span><span className="text-xs font-normal opacity-80">Getting location...</span></span></>
+                        ) : (
+                          <><Navigation size={16} /><span className="flex flex-col items-start"><span>GPS チェックイン ({GPS_THRESHOLD_METERS}m)</span><span className="text-xs font-normal opacity-80">GPS Check-in</span></span></>
+                        )}
+                      </button>
+                      <button
+                        onClick={() => handleManualCheckin(i)}
+                        className="flex items-center justify-center gap-2 rounded-full border border-border py-3 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                      >
+                        <CheckCircle2 size={16} />
+                        <span className="flex flex-col items-start">
+                          <span>手動で訪問済みにする</span>
+                          <span className="text-xs font-normal">Mark as Visited</span>
+                        </span>
+                      </button>
+                      {locGpsError && (
+                        <p className="text-xs text-destructive leading-relaxed whitespace-pre-line">{locGpsError}</p>
                       )}
-                    </button>
-                  )}
-                  <button
-                    onClick={handleManualCheckin}
-                    className="flex items-center justify-center gap-2 rounded-full border border-border py-3 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-                  >
-                    <CheckCircle2 size={16} />
-                    <span className="flex flex-col items-start">
-                      <span>手動で訪問済みにする</span>
-                      <span className="text-xs font-normal">Mark as Visited</span>
-                    </span>
-                  </button>
-                  {gpsError && (
-                    <p className="text-xs text-destructive leading-relaxed">{gpsError}</p>
+                    </div>
                   )}
                 </div>
-              )}
-            </div>
+              );
+            })}
           </div>
         )}
 

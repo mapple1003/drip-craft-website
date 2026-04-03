@@ -64,6 +64,12 @@ export type StoreDoc = {
   updatedAt: Date;
 };
 
+export type SpotLocation = {
+  name: string;
+  lat: number;
+  lng: number;
+};
+
 export type SpotDoc = {
   id: string;
   name: string;
@@ -77,6 +83,8 @@ export type SpotDoc = {
   imageUrl?: string;
   imageUrls?: string[];
   images?: { url: string; caption?: string }[];
+  // Multi-location support (up to 2); falls back to legacy lat/lng if absent
+  locations?: SpotLocation[];
   lat?: number;
   lng?: number;
   isIntro?: boolean;
