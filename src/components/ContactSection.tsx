@@ -81,18 +81,27 @@ export function ContactSection() {
   };
 
   return (
-    <section id="contact" className="relative overflow-hidden px-6 py-24">
-      {/* Fudo-iwa landscape as subtle background accent (bottom-right) */}
-      <div className="pointer-events-none absolute bottom-0 right-0 w-72 opacity-10 md:w-96">
+    <section id="contact" className="relative overflow-hidden px-6 py-24" style={{ background: "var(--pop-cream)" }}>
+      {/* 不動岩 — right-side accent */}
+      <div className="pointer-events-none absolute bottom-0 right-0 w-64 opacity-15 md:w-80">
         <Image
-          src="/images/不動岩.png"
+          src="/images/不動岩.svg"
           alt=""
           width={400}
-          height={200}
-          className="w-full object-cover"
+          height={220}
+          className="w-full object-contain"
+          onError={(e) => { (e.target as HTMLImageElement).src = "/images/不動岩.png"; }}
         />
       </div>
-      <div className="mx-auto max-w-5xl">
+      {/* Dot grid background */}
+      <div
+        className="pointer-events-none absolute inset-0 opacity-[0.04]"
+        style={{
+          backgroundImage: "radial-gradient(circle, #539d84 1px, transparent 1px)",
+          backgroundSize: "24px 24px",
+        }}
+      />
+      <div className="relative z-10 mx-auto max-w-5xl">
         {/* Section header */}
         <div className="mb-16 text-center">
           <p
@@ -101,6 +110,7 @@ export function ContactSection() {
           >
             ✦ CONTACT ✦
           </p>
+
           <h2 className="mb-1 text-3xl font-bold text-foreground md:text-4xl">
             お問い合わせ
           </h2>

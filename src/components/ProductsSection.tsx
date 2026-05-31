@@ -4,32 +4,91 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getProducts } from "@/lib/firestore";
 import type { ProductDoc } from "@/types/admin";
-import { Coffee } from "lucide-react";
 import Link from "next/link";
 
-function ProductImage({ src, alt }: { src?: string; alt: string }) {
-  if (src) {
-    return (
-      <div className="relative h-48 w-full overflow-hidden">
-        <Image
-          src={src}
-          alt={alt}
-          fill
-          className="object-cover transition-transform duration-300 group-hover:scale-105"
-          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-          quality={90}
-        />
-      </div>
-    );
-  }
+// Map product name keywords → illustration file (SVG preferred, PNG fallback)
+const ILLUST_MAP: { key: string; name: string; bg: string }[] = [
+  { key: "さくら湯",       name: "さくら湯",       bg: "#3A5A80" },
+  { key: "アイラ",         name: "アイラトビカズラ", bg: "#5A3020" },
+  { key: "トビカズラ",     name: "アイラトビカズラ", bg: "#5A3020" },
+  { key: "チブサン",       name: "チブサン",         bg: "#B06070" },
+  { key: "不動岩",         name: "不動岩",           bg: "#3A5C3A" },
+  { key: "猿田彦",         name: "猿田彦",           bg: "#2A2420" },
+];
+
+function getIllust(productName: string) {
+  const match = ILLUST_MAP.find((m) => productName.includes(m.key));
+  return match ?? null;
+}
+
+function illustSrc(name: string) { return `/images/${name}.svg`; }
+function illustFallback(name: string) { return `/images/${name}.png`; }
+
+function ProductIllust({ productName }: { productName: string }) {
+  const illust = getIllust(productName);
+  const [src, setSrc] = useState(illust ? illustSrc(illust.name) : "");
+  if (!illust) return null;
   return (
-    <div className="flex h-48 items-center justify-center" style={{ background: "var(--pop-cream)" }}>
-      <Coffee size={36} className="text-muted-foreground/40" />
+    <div className="flex h-full w-full items-center justify-center p-4" style={{ background: illust.bg }}>
+      <Image
+        src={src}
+        alt={productName}
+        width={200}
+        height={150}
+        className="h-32 w-auto object-contain drop-shadow-lg"
+        onError={() => setSrc(illustFallback(illust.name))}
+      />
     </div>
+  );
+}
+
+function ProductCard({ product }: { product: ProductDoc }) {
+  const hasPhoto = !!product.imageUrl;
+  return (
+    <Link href={`/products/${product.id}`}>
+      <div className="group relative overflow-hidden rounded-3xl bg-card shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+        {/* Image area */}
+        <div className="relative h-48 w-full overflow-hidden">
+          {hasPhoto ? (
+            <Image
+              src={product.imageUrl!}
+              alt={product.name}
+              fill
+              className="object-cover transition-transform duration-500 group-hover:scale-105"
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+              quality={90}
+            />
+          ) : (
+            <ProductIllust productName={product.name} />
+          )}
+        </div>
+
+        {/* Info */}
+        <div className="p-5">
+          <h3 className="mb-1 font-bold text-foreground">{product.name}</h3>
+          <p className="mb-3 text-sm leading-relaxed text-muted-foreground line-clamp-2">
+            {product.description}
+          </p>
+          <div className="mb-4 flex flex-wrap gap-1.5">
+            {product.flavor.map((f) => (
+              <Badge key={f} variant="secondary" className="text-xs">{f}</Badge>
+            ))}
+          </div>
+          <div className="flex items-center justify-between">
+            <span className="text-lg font-bold text-foreground">
+              ¥{product.price.toLocaleString("ja-JP")}
+              <span className="text-xs font-normal text-muted-foreground"> /個</span>
+            </span>
+            <Button size="sm" className="text-white" style={{ background: "var(--brand-green)" }} asChild>
+              <span>詳細を見る</span>
+            </Button>
+          </div>
+        </div>
+      </div>
+    </Link>
   );
 }
 
@@ -44,74 +103,60 @@ export function ProductsSection() {
   }, []);
 
   return (
-    <section id="products" className="pb-24">
-      {/* 不動岩 landscape — full-width section header banner */}
-      <div className="relative h-56 w-full overflow-hidden md:h-72">
+    <section id="products" className="relative overflow-hidden pb-24 pt-20">
+      {/* 不動岩 landscape: large decorative placement, not stretched */}
+      <div
+        className="pointer-events-none absolute right-0 top-0 -z-0 h-full w-1/2 overflow-hidden opacity-[0.08] md:opacity-[0.12]"
+        style={{ mixBlendMode: "multiply" }}
+      >
         <Image
-          src="/images/不動岩.png"
-          alt="不動岩"
+          src="/images/不動岩.svg"
+          alt=""
           fill
-          className="object-cover object-center"
-          quality={95}
-          sizes="100vw"
+          className="object-contain object-right-top"
+          onError={(e) => {
+            (e.target as HTMLImageElement).src = "/images/不動岩.png";
+          }}
         />
-        {/* Dark overlay for text readability */}
-        <div
-          className="absolute inset-0"
-          style={{ background: "linear-gradient(to bottom, rgba(0,0,0,0.15), rgba(0,0,0,0.55))" }}
-        />
-        <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 text-white">
-          <p className="text-xs font-bold tracking-[0.3em] opacity-90">✦ LINEUP ✦</p>
-          <h2 className="text-3xl font-bold drop-shadow md:text-4xl">商品ラインナップ</h2>
-          <p className="text-sm opacity-80">地域の名所からインスパイアされたEKIREIオリジナルコーヒー</p>
-        </div>
       </div>
 
-      {/* Products grid */}
-      <div className="mx-auto max-w-6xl px-6 pt-16">
+      <div className="relative z-10 mx-auto max-w-6xl px-6">
+        {/* Section header — bold, left-aligned, editorial */}
+        <div className="mb-14 flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+          <div>
+            <p className="mb-1 text-sm font-bold tracking-[0.25em]" style={{ color: "var(--pop-rose)" }}>
+              ✦ LINEUP
+            </p>
+            <h2 className="text-4xl font-black leading-none tracking-tight text-foreground md:text-6xl">
+              商品
+            </h2>
+            <p className="mt-1 text-lg text-muted-foreground">ラインナップ</p>
+          </div>
+          <p className="max-w-xs text-sm text-muted-foreground">
+            地域の名所や自然からインスパイアされた、EKIREIオリジナルのドリップバッグコーヒー。
+          </p>
+        </div>
+
+        {/* Products grid */}
         {loading ? (
-          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {[1, 2, 3, 4].map((i) => (
-              <Card key={i} className="overflow-hidden">
+              <div key={i} className="overflow-hidden rounded-3xl bg-card shadow-md">
                 <Skeleton className="h-48 w-full rounded-none" />
-                <div className="flex flex-col gap-2 p-4">
+                <div className="flex flex-col gap-2 p-5">
                   <Skeleton className="h-5 w-3/4" />
                   <Skeleton className="h-4 w-full" />
                   <Skeleton className="h-4 w-2/3" />
                 </div>
-              </Card>
+              </div>
             ))}
           </div>
         ) : products.length === 0 ? (
           <p className="text-center text-muted-foreground">準備中です。もうしばらくお待ちください。</p>
         ) : (
-          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {products.map((product) => (
-              <Link key={product.id} href={`/products/${product.id}`}>
-                <Card className="group h-full cursor-pointer overflow-hidden transition-shadow hover:shadow-md">
-                  <ProductImage src={product.imageUrl} alt={product.name} />
-                  <CardHeader className="pb-2">
-                    <h3 className="font-bold text-foreground">{product.name}</h3>
-                    <p className="text-sm leading-relaxed text-muted-foreground">{product.description}</p>
-                  </CardHeader>
-                  <CardContent className="pb-2">
-                    <div className="flex flex-wrap gap-1.5">
-                      {product.flavor.map((f) => (
-                        <Badge key={f} variant="secondary" className="text-xs">{f}</Badge>
-                      ))}
-                    </div>
-                  </CardContent>
-                  <CardFooter className="flex items-center justify-between">
-                    <span className="text-lg font-bold text-foreground">
-                      ¥{product.price.toLocaleString("ja-JP")}
-                      <span className="text-xs font-normal text-muted-foreground"> /個（税抜）</span>
-                    </span>
-                    <Button size="sm" variant="outline" className="border-primary/30 text-primary hover:bg-primary/5" asChild>
-                      <span>詳細を見る</span>
-                    </Button>
-                  </CardFooter>
-                </Card>
-              </Link>
+              <ProductCard key={product.id} product={product} />
             ))}
           </div>
         )}
