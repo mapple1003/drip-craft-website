@@ -91,39 +91,29 @@ export function ProductsSection() {
   }, []);
 
   return (
-    <section id="products" className="relative overflow-hidden pb-24 pt-20">
-      {/* 不動岩 landscape: large decorative placement, not stretched */}
-      <div
-        className="pointer-events-none absolute right-0 top-0 -z-0 h-full w-1/2 overflow-hidden opacity-[0.08] md:opacity-[0.12]"
-        style={{ mixBlendMode: "multiply" }}
-      >
-        <Image
-          src="/images/不動岩.svg"
+    <section id="products" className="overflow-hidden pb-24">
+
+      {/* アイラトビカズラが背景 → タイトルがその上に */}
+      <div className="relative h-56 overflow-hidden md:h-72">
+        {/* レイヤー1: アイラトビカズライラスト */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/images/アイラトビカズラ.svg"
           alt=""
-          fill
-          className="object-contain object-right-top"
-          onError={(e) => {
-            (e.target as HTMLImageElement).src = "/images/不動岩.png";
-          }}
+          className="absolute inset-0 h-full w-full"
+          style={{ objectFit: "cover", objectPosition: "center" }}
         />
+        {/* レイヤー2: 暗いオーバーレイ */}
+        <div className="absolute inset-0" style={{ background: "rgba(40,15,5,0.72)" }} />
+        {/* レイヤー3: タイトルを重ねる */}
+        <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-white">
+          <p className="text-xs font-bold tracking-[0.35em] text-white/60">✦ LINEUP ✦</p>
+          <h2 className="text-4xl font-black drop-shadow-lg md:text-6xl">商品ラインナップ</h2>
+          <p className="text-sm text-white/70">地域の名所からインスパイアされたEKIREIオリジナルコーヒー</p>
+        </div>
       </div>
 
-      <div className="relative z-10 mx-auto max-w-6xl px-6">
-        {/* Section header — bold, left-aligned, editorial */}
-        <div className="mb-14 flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
-          <div>
-            <p className="mb-1 text-sm font-bold tracking-[0.25em]" style={{ color: "var(--pop-rose)" }}>
-              ✦ LINEUP
-            </p>
-            <h2 className="text-4xl font-black leading-none tracking-tight text-foreground md:text-6xl">
-              商品
-            </h2>
-            <p className="mt-1 text-lg text-muted-foreground">ラインナップ</p>
-          </div>
-          <p className="max-w-xs text-sm text-muted-foreground">
-            地域の名所や自然からインスパイアされた、EKIREIオリジナルのドリップバッグコーヒー。
-          </p>
-        </div>
+      <div className="mx-auto max-w-6xl px-6 pt-14">
 
         {/* Products grid */}
         {loading ? (

@@ -22,93 +22,96 @@ export function HeroSection() {
   return (
     <section className="overflow-hidden">
 
-      {/* ══ HERO: テキスト先、イラスト後 ══ */}
-      <div className="flex flex-col md:flex-row md:min-h-[85vh]">
+      {/* ══ HERO: さくら湯が背景、文字がその上に ══ */}
+      <div className="relative flex min-h-[90vh] items-center overflow-hidden">
 
-        {/* テキストパネル — DOM上で先に来るのでモバイルでも上に表示 */}
+        {/* レイヤー1: さくら湯イラスト — 全面背景 */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/images/さくら湯.svg"
+          alt=""
+          className="absolute inset-0 h-full w-full"
+          style={{ objectFit: "cover", objectPosition: "center" }}
+        />
+
+        {/* レイヤー2: 左から右へのグラデーションオーバーレイ（文字可読性確保） */}
         <div
-          className="relative flex flex-1 flex-col justify-center overflow-hidden px-8 py-14 md:px-14 md:py-20"
-          style={{ background: "var(--pop-cream)" }}
-        >
-          {/* ドット背景 */}
-          <div className="pointer-events-none absolute inset-0 opacity-[0.05]"
-            style={{ backgroundImage:"radial-gradient(circle,#539d84 1.5px,transparent 1.5px)", backgroundSize:"22px 22px" }} />
+          className="absolute inset-0"
+          style={{
+            background:
+              "linear-gradient(105deg, rgba(20,45,30,0.96) 0%, rgba(20,45,30,0.88) 35%, rgba(20,45,30,0.55) 60%, rgba(20,45,30,0.15) 100%)",
+          }}
+        />
 
-          <div className="relative z-10 max-w-lg">
-            <span className="mb-5 inline-block rounded-full px-4 py-1.5 text-xs font-bold tracking-[0.25em] text-white"
-              style={{ background:"var(--pop-rose)" }}>
+        {/* レイヤー3: 文字・ボタン — イラストの上に重ねる */}
+        <div className="relative z-10 mx-auto w-full max-w-6xl px-8 py-16">
+          <div className="max-w-xl">
+            <span
+              className="mb-6 inline-block rounded-full px-4 py-1.5 text-xs font-bold tracking-[0.25em] text-white"
+              style={{ background: "var(--pop-rose)" }}
+            >
               ✦ SPECIALTY DRIP BAG ✦
             </span>
-            <h1 className="mb-6 font-black leading-tight text-foreground">
-              <span className="block text-3xl md:text-5xl lg:text-6xl">{line1}</span>
-              <span className="block text-3xl md:text-5xl lg:text-6xl" style={{ color:"var(--pop-rose)" }}>{line2}</span>
+            <h1 className="mb-6 font-black leading-tight text-white">
+              <span className="block text-4xl md:text-6xl lg:text-7xl drop-shadow-lg">{line1}</span>
+              <span className="block text-4xl md:text-6xl lg:text-7xl drop-shadow-lg" style={{ color: "#FFD580" }}>
+                {line2}
+              </span>
             </h1>
-            <p className="mb-8 leading-relaxed text-muted-foreground">{hero.subheading}</p>
-            <div className="flex flex-wrap gap-3">
+            <p className="mb-10 text-base leading-relaxed text-white/80 md:text-lg">
+              {hero.subheading}
+            </p>
+            <div className="flex flex-wrap gap-4">
               <a href="#products">
-                <Button size="lg" className="text-white shadow-md" style={{ background:"var(--brand-green)" }}>
+                <Button size="lg" className="text-base text-white shadow-xl" style={{ background: "var(--pop-rose)" }}>
                   商品を見る
                 </Button>
               </a>
               <a href="#story">
-                <Button size="lg" variant="outline" style={{ borderColor:"var(--brand-green)", color:"var(--brand-green)" }}>
+                <Button size="lg"
+                  className="border-2 border-white/60 bg-transparent text-base text-white backdrop-blur-sm hover:bg-white/15">
                   ブランドについて
                 </Button>
               </a>
             </div>
           </div>
-
-          {/* コーナーにアイラトビカズラ — 装飾 */}
-          <div className="pointer-events-none absolute -bottom-8 -right-4 w-36 opacity-25 rotate-12 md:w-44">
-            <IllustImg name="アイラトビカズラ" alt="" className="w-full h-auto" />
-          </div>
         </div>
 
-        {/* イラストパネル */}
-        <div
-          className="flex flex-1 flex-col items-center justify-center gap-6 px-8 py-12 md:py-0"
-          style={{ background:"#2C4A3A" }}
-        >
-          <div className="w-full max-w-sm drop-shadow-2xl">
-            <IllustImg name="さくら湯" alt="さくら湯ブレンド" className="w-full h-auto" />
-          </div>
-          <span className="rounded-full px-5 py-1.5 text-sm font-bold tracking-wide text-white"
-            style={{ background:"rgba(255,255,255,0.15)" }}>
-            さくら湯ブレンド
-          </span>
-          <div className="w-full max-w-xs opacity-70">
-            <IllustImg name="不動岩" alt="不動岩ブレンド" className="w-full h-auto" />
-          </div>
+        {/* レイヤー3: 右下に不動岩 — 浮かせて配置 */}
+        <div className="absolute bottom-0 right-0 z-10 w-[45%] max-w-md opacity-80 drop-shadow-2xl md:block hidden">
+          <IllustImg name="不動岩" alt="" className="w-full h-auto" />
         </div>
       </div>
 
-      {/* ══ ピンクマーキー帯 ══ */}
-      <div className="flex items-center gap-8 overflow-hidden py-3" style={{ background:"var(--pop-rose)" }}>
-        {Array.from({length:10}).map((_,i) => (
+      {/* ══ ピンク帯マーキー ══ */}
+      <div className="flex items-center gap-8 overflow-hidden py-3" style={{ background: "var(--pop-rose)" }}>
+        {Array.from({ length: 10 }).map((_, i) => (
           <span key={i} className="shrink-0 text-sm font-bold tracking-widest text-white">✦ EKIREI COFFEE</span>
         ))}
       </div>
 
-      {/* ══ 全イラストショーケース ══ */}
-      <div style={{ background:"#1C2E22" }} className="px-4 py-10 md:px-8">
-        <p className="mb-6 text-center text-xs font-bold tracking-[0.3em] text-white/40">✦ ILLUSTRATION COLLECTION ✦</p>
+      {/* ══ 全7点イラスト — 暗い帯の上に並べる ══ */}
+      <div className="overflow-hidden px-4 py-10 md:px-8" style={{ background: "#1C2E22" }}>
+        <p className="mb-5 text-center text-[10px] font-bold tracking-[0.3em] text-white/30">✦ ILLUSTRATION COLLECTION ✦</p>
         <div className="mx-auto max-w-5xl">
           <div className="grid grid-cols-4 gap-3 md:grid-cols-7 md:gap-4">
             {[
-              { name:"さくら湯",        label:"さくら湯",    bg:"#3A5A80" },
-              { name:"アイラトビカズラ",  label:"アイラ",      bg:"#5A3020" },
-              { name:"チブサン",         label:"チブサン",    bg:"#B06070" },
-              { name:"チブサン_宇宙人",  label:"古墳",        bg:"#8B2020" },
-              { name:"不動岩",           label:"不動岩",      bg:"#3A5C3A" },
-              { name:"猿田彦",           label:"猿田彦",      bg:"#2A2420" },
-              { name:"石人",             label:"石人",        bg:"#7A6040" },
+              { name: "さくら湯",        label: "さくら湯",  bg: "#3A5A80" },
+              { name: "アイラトビカズラ", label: "アイラ",    bg: "#5A3020" },
+              { name: "チブサン",         label: "チブサン",  bg: "#B06070" },
+              { name: "チブサン_宇宙人",  label: "古墳",      bg: "#8B2020" },
+              { name: "不動岩",           label: "不動岩",    bg: "#3A5C3A" },
+              { name: "猿田彦",           label: "猿田彦",    bg: "#2A2420" },
+              { name: "石人",             label: "石人",      bg: "#7A6040" },
             ].map((it) => (
               <div key={it.name} className="group flex flex-col items-center gap-1.5">
-                <div className="w-full overflow-hidden rounded-xl p-2 transition-transform duration-200 group-hover:scale-105 shadow-md"
-                  style={{ background:it.bg }}>
+                <div
+                  className="w-full overflow-hidden rounded-xl p-2 shadow-md transition-transform duration-200 group-hover:scale-105"
+                  style={{ background: it.bg }}
+                >
                   <IllustImg name={it.name} alt={it.label} className="w-full h-auto" />
                 </div>
-                <span className="text-center text-[9px] font-medium text-white/50 md:text-[11px]">{it.label}</span>
+                <span className="text-[9px] font-medium text-white/40 md:text-[11px]">{it.label}</span>
               </div>
             ))}
           </div>
