@@ -55,7 +55,7 @@ export function ProductsSection() {
       {/* Decorative corner illustration (chibusankofun red pattern) */}
       <div className="pointer-events-none absolute right-0 top-0 h-40 w-40 -translate-y-1/4 translate-x-1/4 overflow-hidden rounded-full opacity-10">
         <Image
-          src="/images/illust-chibusankofun.png"
+          src="/images/チブサン_宇宙人.png"
           alt=""
           fill
           className="object-cover"

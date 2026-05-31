@@ -87,20 +87,20 @@ export function StorySection() {
                 <div className="absolute bottom-0 left-4 w-48 -rotate-3 overflow-hidden rounded-2xl shadow-lg md:w-56">
                   <div className="relative aspect-[3/4] w-full">
                     <Image
-                      src="/images/illust-saruta.png"
-                      alt="サルタヒコ"
+                      src="/images/猿田彦.png"
+                      alt="猿田彦"
                       fill
                       className="object-cover"
                       sizes="224px"
                     />
                   </div>
                 </div>
-                {/* Bear — right, overlapping slightly */}
+                {/* Stone figure — right, overlapping slightly */}
                 <div className="absolute right-4 top-4 w-44 rotate-2 overflow-hidden rounded-2xl shadow-lg md:w-52">
                   <div className="relative aspect-square w-full">
                     <Image
-                      src="/images/illust-bear.png"
-                      alt="チブサン"
+                      src="/images/石人2.png"
+                      alt="石人"
                       fill
                       className="object-cover"
                       sizes="208px"

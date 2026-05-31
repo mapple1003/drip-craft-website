@@ -17,29 +17,29 @@ const DEFAULT_HERO: SiteContentHero = {
 // Floating illustration cards for the hero collage
 const HERO_ILLUSTS = [
   {
-    src: "/images/illust-warabi.png",
-    alt: "ワラビナブレンド",
+    src: "/images/アイラトビカズラ.png",
+    alt: "アイラトビカズラ",
     className:
       "absolute top-0 right-0 w-52 md:w-60 rotate-2 rounded-2xl shadow-lg overflow-hidden z-20",
     aspect: "aspect-[4/3]",
   },
   {
-    src: "/images/illust-sakurayu.png",
+    src: "/images/さくら湯.png",
     alt: "さくら湯ブレンド",
     className:
       "absolute top-12 left-0 w-44 md:w-52 -rotate-3 rounded-2xl shadow-lg overflow-hidden z-10",
     aspect: "aspect-square",
   },
   {
-    src: "/images/illust-bear.png",
+    src: "/images/チブサン.png",
     alt: "チブサン",
     className:
       "absolute bottom-4 right-4 w-40 md:w-48 rotate-1 rounded-2xl shadow-lg overflow-hidden z-20",
     aspect: "aspect-square",
   },
   {
-    src: "/images/illust-saruta.png",
-    alt: "サルタヒコ",
+    src: "/images/猿田彦.png",
+    alt: "猿田彦",
     className:
       "absolute bottom-0 left-8 w-36 md:w-44 -rotate-2 rounded-xl shadow-md overflow-hidden z-10",
     aspect: "aspect-[3/4]",

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -80,7 +81,17 @@ export function ContactSection() {
   };
 
   return (
-    <section id="contact" className="px-6 py-24">
+    <section id="contact" className="relative overflow-hidden px-6 py-24">
+      {/* Fudo-iwa landscape as subtle background accent (bottom-right) */}
+      <div className="pointer-events-none absolute bottom-0 right-0 w-72 opacity-10 md:w-96">
+        <Image
+          src="/images/不動岩.png"
+          alt=""
+          width={400}
+          height={200}
+          className="w-full object-cover"
+        />
+      </div>
       <div className="mx-auto max-w-5xl">
         {/* Section header */}
         <div className="mb-16 text-center">
