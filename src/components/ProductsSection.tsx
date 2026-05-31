@@ -93,6 +93,9 @@ export function ProductsSection() {
   return (
     <section id="products" className="overflow-hidden pb-24">
 
+      {/* クリーム区切り */}
+      <div className="h-16 md:h-24" style={{ background: "var(--pop-cream)" }} />
+
       {/* アイラトビカズラが背景 → タイトルがその上に */}
       <div className="relative h-56 overflow-hidden md:h-72">
         {/* レイヤー1: アイラトビカズライラスト */}
