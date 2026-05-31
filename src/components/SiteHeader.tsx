@@ -23,7 +23,15 @@ export function SiteHeader() {
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-card/80 backdrop-blur-sm">
+    <header className="sticky top-0 z-50 w-full border-b bg-card/90 backdrop-blur-sm">
+      {/* Pop color stripe at top */}
+      <div
+        className="h-1 w-full"
+        style={{
+          background:
+            "linear-gradient(90deg, var(--brand-green) 0%, var(--pop-rose) 33%, var(--pop-ochre) 66%, var(--brand-purple) 100%)",
+        }}
+      />
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
         {/* Logo */}
         <a href="#" className="flex items-center gap-2">

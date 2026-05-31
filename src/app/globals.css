@@ -49,15 +49,15 @@
 
 :root {
   --radius: 0.75rem;
-  /* Background - warm cream (Soft Neutral base) */
-  --background: oklch(0.98 0.01 75);
-  --foreground: oklch(0.21 0.006 286);
+  /* Background - warm washi paper feel */
+  --background: oklch(0.985 0.025 78);
+  --foreground: oklch(0.20 0.015 55);
   /* Card */
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.21 0.006 286);
+  --card-foreground: oklch(0.20 0.015 55);
   /* Popover */
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.21 0.006 286);
+  --popover-foreground: oklch(0.20 0.015 55);
   /* Primary - brand green #539d84 */
   --primary: oklch(0.60 0.09 162);
   --primary-foreground: oklch(0.985 0 0);
@@ -94,9 +94,14 @@
   /* Brand color custom properties */
   --brand-green: #539d84;
   --brand-purple: #693c85;
-  /* Card shadow (Soft Neutral style) */
-  --shadow-card: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  --shadow-card-hover: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  /* Pop / illustration palette */
+  --pop-rose: #C84B6A;
+  --pop-ochre: #C47830;
+  --pop-navy: #2C4060;
+  --pop-cream: #FAF2E4;
+  /* Card shadow */
+  --shadow-card: 0 2px 4px 0 rgb(0 0 0 / 0.06), 0 0 0 1px rgb(0 0 0 / 0.03);
+  --shadow-card-hover: 0 8px 16px -2px rgb(0 0 0 / 0.12), 0 4px 8px -4px rgb(0 0 0 / 0.08);
 }
 
 .dark {

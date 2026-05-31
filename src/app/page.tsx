@@ -1,5 +1,6 @@
 import { SiteHeader } from "@/components/SiteHeader";
 import { HeroSection } from "@/components/HeroSection";
+import { IllustParade } from "@/components/IllustParade";
 import { ProductsSection } from "@/components/ProductsSection";
 import { StorySection } from "@/components/StorySection";
 import { EventsSection } from "@/components/EventsSection";
@@ -14,6 +15,8 @@ export default function Home() {
       <SiteHeader />
       <main className="flex-1">
         <HeroSection />
+        {/* Illustration parade — visual transition after hero */}
+        <IllustParade />
         <ProductsSection />
         <StorySection />
         <EventsSection />

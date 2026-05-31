@@ -84,7 +84,12 @@ export function ContactSection() {
       <div className="mx-auto max-w-5xl">
         {/* Section header */}
         <div className="mb-16 text-center">
-          <p className="mb-3 text-sm font-medium tracking-widest text-primary">CONTACT</p>
+          <p
+            className="mb-3 text-sm font-bold tracking-widest"
+            style={{ color: "var(--brand-purple)" }}
+          >
+            ✦ CONTACT ✦
+          </p>
           <h2 className="mb-1 text-3xl font-bold text-foreground md:text-4xl">
             お問い合わせ
           </h2>

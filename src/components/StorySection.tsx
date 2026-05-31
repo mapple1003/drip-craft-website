@@ -38,7 +38,7 @@ export function StorySection() {
       <div className="mx-auto max-w-6xl">
         <div className="grid gap-16 md:grid-cols-2 md:items-center">
           <div>
-            <p className="mb-3 text-sm font-medium tracking-widest text-primary">OUR STORY</p>
+            <p className="mb-3 text-sm font-bold tracking-widest" style={{ color: "var(--brand-green)" }}>✦ OUR STORY ✦</p>
             <h2 className="mb-1 text-3xl font-bold leading-snug text-foreground md:text-4xl">
               {story.heading.split("\n").map((line, i) => (
                 <span key={i}>{i > 0 && <br />}{line}</span>
@@ -66,8 +66,8 @@ export function StorySection() {
             </div>
           </div>
 
-          {/* Right panel: photo or placeholder */}
-          <div className="relative">
+          {/* Right panel: illustration collage */}
+          <div className="relative flex items-center justify-center">
             {story.imageUrl ? (
               <div className="overflow-hidden rounded-3xl shadow-lg">
                 <div className="relative aspect-square w-full">
@@ -81,14 +81,47 @@ export function StorySection() {
                 </div>
               </div>
             ) : (
-              <div className="aspect-square rounded-3xl" style={{ background: "linear-gradient(135deg, oklch(0.60 0.09 162 / 0.15) 0%, oklch(0.42 0.13 310 / 0.15) 100%)" }}>
-                <div className="absolute inset-8 flex flex-col items-center justify-center gap-6 text-center">
-                  <div className="text-8xl">☕</div>
-                  <blockquote className="text-lg font-semibold italic leading-relaxed text-foreground/70">
-                    &ldquo;Good coffee is a pleasure.<br />Good friends are a treasure.&rdquo;
-                  </blockquote>
-                  <div className="h-px w-16" style={{ background: "oklch(0.60 0.09 162 / 0.4)" }} />
-                  <p className="text-sm tracking-widest text-muted-foreground">EKIREI</p>
+              /* Illustration collage: bear + saruta side by side */
+              <div className="relative h-80 w-full max-w-md md:h-96">
+                {/* Saruta — large, left, slightly rotated */}
+                <div className="absolute bottom-0 left-4 w-48 -rotate-3 overflow-hidden rounded-2xl shadow-lg md:w-56">
+                  <div className="relative aspect-[3/4] w-full">
+                    <Image
+                      src="/images/illust-saruta.png"
+                      alt="サルタヒコ"
+                      fill
+                      className="object-cover"
+                      sizes="224px"
+                    />
+                  </div>
+                </div>
+                {/* Bear — right, overlapping slightly */}
+                <div className="absolute right-4 top-4 w-44 rotate-2 overflow-hidden rounded-2xl shadow-lg md:w-52">
+                  <div className="relative aspect-square w-full">
+                    <Image
+                      src="/images/illust-bear.png"
+                      alt="チブサン"
+                      fill
+                      className="object-cover"
+                      sizes="208px"
+                    />
+                  </div>
+                </div>
+                {/* Decorative dots */}
+                <div
+                  className="pointer-events-none absolute inset-0 -z-10 opacity-20"
+                  style={{
+                    backgroundImage:
+                      "radial-gradient(circle, var(--pop-rose) 1.5px, transparent 1.5px)",
+                    backgroundSize: "20px 20px",
+                  }}
+                />
+                {/* Coffee accent text */}
+                <div
+                  className="absolute -top-4 left-1/2 -translate-x-1/2 rounded-full px-4 py-1.5 text-xs font-bold tracking-widest text-white shadow-md"
+                  style={{ background: "var(--pop-ochre)" }}
+                >
+                  ✦ STORY ✦
                 </div>
               </div>
             )}

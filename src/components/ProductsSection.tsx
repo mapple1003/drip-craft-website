@@ -51,10 +51,25 @@ export function ProductsSection() {
   // For now show all products as individual cards
 
   return (
-    <section id="products" className="bg-muted/40 px-6 py-24">
+    <section id="products" className="relative overflow-hidden px-6 py-24" style={{ background: "var(--pop-cream)" }}>
+      {/* Decorative corner illustration (chibusankofun red pattern) */}
+      <div className="pointer-events-none absolute right-0 top-0 h-40 w-40 -translate-y-1/4 translate-x-1/4 overflow-hidden rounded-full opacity-10">
+        <Image
+          src="/images/illust-chibusankofun.png"
+          alt=""
+          fill
+          className="object-cover"
+          sizes="160px"
+        />
+      </div>
       <div className="mx-auto max-w-6xl">
         <div className="mb-16 text-center">
-          <p className="mb-3 text-sm font-medium tracking-widest text-primary">LINEUP</p>
+          <p
+            className="mb-3 text-sm font-bold tracking-widest"
+            style={{ color: "var(--pop-rose)" }}
+          >
+            ✦ LINEUP ✦
+          </p>
           <h2 className="mb-1 text-3xl font-bold text-foreground md:text-4xl">
             商品ラインナップ
           </h2>
