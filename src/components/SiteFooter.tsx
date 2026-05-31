@@ -17,38 +17,20 @@ export function SiteFooter() {
   }, []);
 
   return (
-    <footer className="relative overflow-hidden border-t bg-card">
-      {/* アイラトビカズラ — subtle background decoration */}
-      <div className="pointer-events-none absolute right-0 top-0 h-full w-64 opacity-[0.07] md:w-80">
-        <Image
-          src="/images/アイラトビカズラ.png"
-          alt=""
-          fill
-          className="object-cover object-left"
-          sizes="320px"
-        />
-      </div>
-
-      <div className="relative px-6 py-12">
+    <footer style={{ background: "#1C2E22" }}>
+      <div className="px-6 py-12">
         <div className="mx-auto max-w-6xl">
           <div className="mb-8 flex flex-col items-center gap-4 text-center">
-            {/* Logo */}
             <div className="flex items-center gap-2">
-              <Image
-                src="/images/logo.png"
-                alt="EKIREI"
-                width={40}
-                height={40}
-                className="h-10 w-auto object-contain"
-              />
-              <span className="text-xl font-bold tracking-widest text-primary">EKIREI</span>
+              <Image src="/images/logo.png" alt="EKIREI" width={40} height={40}
+                className="h-10 w-auto object-contain" />
+              <span className="text-xl font-bold tracking-widest text-white">EKIREI</span>
             </div>
 
-            <p className="max-w-xs text-sm text-muted-foreground">
+            <p className="max-w-xs text-sm text-white/60">
               厳選したスペシャルティコーヒーを、毎日の一杯に。
             </p>
 
-            {/* Colorful dot accent */}
             <div className="flex items-center gap-2">
               {(["var(--brand-green)", "var(--pop-rose)", "var(--pop-ochre)", "var(--brand-purple)"] as const).map(
                 (color, i) => (
@@ -57,25 +39,21 @@ export function SiteFooter() {
               )}
             </div>
 
-            <a
-              href={`https://instagram.com/${handle}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-primary"
-              aria-label="Instagram"
-            >
+            <a href={`https://instagram.com/${handle}`} target="_blank" rel="noopener noreferrer"
+              className="flex items-center gap-2 text-sm text-white/60 transition-colors hover:text-white"
+              aria-label="Instagram">
               <Instagram size={16} />
               @{handle}
             </a>
           </div>
 
-          <Separator className="mb-8" />
+          <Separator className="mb-8 bg-white/10" />
 
-          <div className="flex flex-col items-center gap-2 text-center text-xs text-muted-foreground">
+          <div className="flex flex-col items-center gap-2 text-center text-xs text-white/40">
             <nav className="flex gap-6">
-              <a href="#products" className="transition-colors hover:text-foreground">商品</a>
-              <a href="#story" className="transition-colors hover:text-foreground">ブランドについて</a>
-              <a href="#contact" className="transition-colors hover:text-foreground">お問い合わせ</a>
+              <a href="#products" className="transition-colors hover:text-white/80">商品</a>
+              <a href="#story" className="transition-colors hover:text-white/80">ブランドについて</a>
+              <a href="#contact" className="transition-colors hover:text-white/80">お問い合わせ</a>
             </nav>
             <p className="mt-2">© 2025 EKIREI. All rights reserved.</p>
           </div>

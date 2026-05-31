@@ -56,26 +56,17 @@ export function StorySection() {
         </div>
       </div>
 
-      {/* ── 本文: アイラトビカズラカラーの背景 + 右にイラスト ── */}
-      <div className="relative overflow-hidden px-6 py-16" style={{ background: "#2A1408" }}>
-        {/* アイラトビカズラ — 右に薄く配置 */}
-        <div className="pointer-events-none absolute right-0 top-0 h-full w-1/2 opacity-20">
-          <IllustImg name="アイラトビカズラ" alt="" className="h-full w-full object-cover object-left" />
-        </div>
-
+      {/* ── 本文 ── */}
+      <div className="relative overflow-hidden px-6 py-16" style={{ background: "#1A1008" }}>
         <div className="relative z-10 mx-auto max-w-6xl grid gap-12 md:grid-cols-2">
           <div>
             <p className="mb-5 leading-relaxed text-white/80">{story.body1}</p>
             <p className="mb-8 leading-relaxed text-white/80">{story.body2}</p>
 
-            {story.imageUrl ? (
+            {story.imageUrl && (
               <div className="overflow-hidden rounded-2xl shadow-xl">
                 <Image src={story.imageUrl} alt="ブランドストーリー"
                   width={520} height={300} className="w-full object-cover" quality={90} />
-              </div>
-            ) : (
-              <div className="overflow-hidden rounded-2xl shadow-xl">
-                <IllustImg name="アイラトビカズラ" alt="" className="w-full h-auto" />
               </div>
             )}
           </div>
