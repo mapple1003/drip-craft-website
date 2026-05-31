@@ -53,8 +53,8 @@ export function HeroSection() {
               ✦ SPECIALTY DRIP BAG ✦
             </span>
             <h1 className="mb-6 font-black leading-tight text-white">
-              <span className="block text-4xl md:text-6xl lg:text-7xl drop-shadow-lg">{line1}</span>
-              <span className="block text-4xl md:text-6xl lg:text-7xl drop-shadow-lg" style={{ color: "#FFD580" }}>
+              <span className="block text-3xl md:text-5xl lg:text-6xl drop-shadow-lg whitespace-nowrap">{line1}</span>
+              <span className="block text-3xl md:text-5xl lg:text-6xl drop-shadow-lg whitespace-nowrap" style={{ color: "#FFD580" }}>
                 {line2}
               </span>
             </h1>
