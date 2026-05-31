@@ -83,6 +83,9 @@ export function ContactSection() {
   return (
     <section id="contact" className="overflow-hidden">
 
+      {/* クリーム区切り */}
+      <div className="h-16 md:h-24" style={{ background: "var(--pop-cream)" }} />
+
       {/* 石人が背景 → タイトルが上に */}
       <div className="relative h-44 overflow-hidden md:h-56">
         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -95,7 +98,7 @@ export function ContactSection() {
         </div>
       </div>
 
-      <div className="px-6 py-14">
+      <div className="px-6 py-14" style={{ background: "var(--pop-cream)" }}>
       <div className="mx-auto max-w-5xl">
         {/* Section header */}
         <div className="mb-16 text-center">

@@ -56,8 +56,8 @@ export function StorySection() {
         </div>
       </div>
 
-      {/* ── 本文 ── */}
-      <div className="relative overflow-hidden px-6 py-16" style={{ background: "#1A1008" }}>
+      {/* ── 本文: さくら湯のえんじ色（深い臙脂）ベース ── */}
+      <div className="relative overflow-hidden px-6 py-16" style={{ background: "#3A0E0E" }}>
         <div className="relative z-10 mx-auto max-w-6xl grid gap-12 md:grid-cols-2">
           <div>
             <p className="mb-5 leading-relaxed text-white/80">{story.body1}</p>

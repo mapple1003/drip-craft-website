@@ -20,6 +20,9 @@ export function StoresSection() {
   return (
     <section id="stores" className="overflow-hidden">
 
+      {/* クリーム区切り */}
+      <div className="h-16 md:h-24" style={{ background: "var(--pop-cream)" }} />
+
       {/* 猿田彦が背景 → タイトルが上に */}
       <div className="relative h-44 overflow-hidden md:h-56">
         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -33,7 +36,7 @@ export function StoresSection() {
       </div>
 
       {/* 店舗カード */}
-      <div className="px-6 py-14">
+      <div className="px-6 py-14" style={{ background: "var(--pop-cream)" }}>
         <div className="mx-auto max-w-6xl">
           {loading ? (
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
