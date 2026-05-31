@@ -56,8 +56,8 @@ export function StorySection() {
         </div>
       </div>
 
-      {/* ── 本文: さくら湯のえんじ色（深い臙脂）ベース ── */}
-      <div className="relative overflow-hidden px-6 py-16" style={{ background: "#3A0E0E" }}>
+      {/* ── 本文: さくら湯SVGの実際の赤色(#9f3132) ── */}
+      <div className="relative overflow-hidden px-6 py-16" style={{ background: "#9f3132" }}>
         <div className="relative z-10 mx-auto max-w-6xl grid gap-12 md:grid-cols-2">
           <div>
             <p className="mb-5 leading-relaxed text-white/80">{story.body1}</p>
