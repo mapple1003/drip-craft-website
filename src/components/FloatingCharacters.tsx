@@ -91,7 +91,7 @@ export function FloatingCharacters() {
   return (
     <div
       ref={containerRef}
-      className="pointer-events-none fixed inset-0 z-20 overflow-hidden"
+      className="pointer-events-none fixed inset-0 z-10 overflow-hidden"
       aria-hidden="true"
     >
       {CHARS.map((char) => (
