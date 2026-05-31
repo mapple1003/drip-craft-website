@@ -8,39 +8,27 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { getProducts } from "@/lib/firestore";
 import type { ProductDoc } from "@/types/admin";
 import Link from "next/link";
+import { IllustImg } from "@/components/IllustImg";
 
-// Map product name keywords → illustration file (SVG preferred, PNG fallback)
 const ILLUST_MAP: { key: string; name: string; bg: string }[] = [
-  { key: "さくら湯",       name: "さくら湯",       bg: "#3A5A80" },
-  { key: "アイラ",         name: "アイラトビカズラ", bg: "#5A3020" },
-  { key: "トビカズラ",     name: "アイラトビカズラ", bg: "#5A3020" },
-  { key: "チブサン",       name: "チブサン",         bg: "#B06070" },
-  { key: "不動岩",         name: "不動岩",           bg: "#3A5C3A" },
-  { key: "猿田彦",         name: "猿田彦",           bg: "#2A2420" },
+  { key: "さくら湯",   name: "さくら湯",       bg: "#3A5A80" },
+  { key: "アイラ",     name: "アイラトビカズラ", bg: "#5A3020" },
+  { key: "トビカズラ", name: "アイラトビカズラ", bg: "#5A3020" },
+  { key: "チブサン",   name: "チブサン",         bg: "#B06070" },
+  { key: "不動岩",     name: "不動岩",           bg: "#3A5C3A" },
+  { key: "猿田彦",     name: "猿田彦",           bg: "#2A2420" },
 ];
 
-function getIllust(productName: string) {
-  const match = ILLUST_MAP.find((m) => productName.includes(m.key));
-  return match ?? null;
+function getIllust(name: string) {
+  return ILLUST_MAP.find((m) => name.includes(m.key)) ?? null;
 }
-
-function illustSrc(name: string) { return `/images/${name}.svg`; }
-function illustFallback(name: string) { return `/images/${name}.png`; }
 
 function ProductIllust({ productName }: { productName: string }) {
   const illust = getIllust(productName);
-  const [src, setSrc] = useState(illust ? illustSrc(illust.name) : "");
   if (!illust) return null;
   return (
-    <div className="flex h-full w-full items-center justify-center p-4" style={{ background: illust.bg }}>
-      <Image
-        src={src}
-        alt={productName}
-        width={200}
-        height={150}
-        className="h-32 w-auto object-contain drop-shadow-lg"
-        onError={() => setSrc(illustFallback(illust.name))}
-      />
+    <div className="flex h-full w-full items-center justify-center p-3" style={{ background: illust.bg }}>
+      <IllustImg name={illust.name} alt={productName} className="h-28 w-auto" />
     </div>
   );
 }
