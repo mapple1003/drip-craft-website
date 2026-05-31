@@ -81,27 +81,22 @@ export function ContactSection() {
   };
 
   return (
-    <section id="contact" className="relative overflow-hidden px-6 py-24" style={{ background: "var(--pop-cream)" }}>
-      {/* 不動岩 — right-side accent */}
-      <div className="pointer-events-none absolute bottom-0 right-0 w-64 opacity-15 md:w-80">
-        <Image
-          src="/images/不動岩.svg"
-          alt=""
-          width={400}
-          height={220}
-          className="w-full object-contain"
-          onError={(e) => { (e.target as HTMLImageElement).src = "/images/不動岩.png"; }}
-        />
+    <section id="contact" className="overflow-hidden">
+
+      {/* 石人が背景 → タイトルが上に */}
+      <div className="relative h-44 overflow-hidden md:h-56">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/images/石人.svg" alt=""
+          className="absolute inset-0 h-full w-full" style={{ objectFit: "cover", objectPosition: "center" }} />
+        <div className="absolute inset-0" style={{ background: "rgba(45,30,12,0.80)" }} />
+        <div className="relative z-10 flex h-full flex-col items-center justify-center gap-1 text-white">
+          <p className="text-xs font-bold tracking-[0.35em] text-white/50">✦ CONTACT ✦</p>
+          <h2 className="text-3xl font-black drop-shadow md:text-5xl">お問い合わせ</h2>
+        </div>
       </div>
-      {/* Dot grid background */}
-      <div
-        className="pointer-events-none absolute inset-0 opacity-[0.04]"
-        style={{
-          backgroundImage: "radial-gradient(circle, #539d84 1px, transparent 1px)",
-          backgroundSize: "24px 24px",
-        }}
-      />
-      <div className="relative z-10 mx-auto max-w-5xl">
+
+      <div className="px-6 py-14">
+      <div className="mx-auto max-w-5xl">
         {/* Section header */}
         <div className="mb-16 text-center">
           <p
@@ -236,6 +231,7 @@ export function ContactSection() {
             </CardContent>
           </Card>
         </div>
+      </div>
       </div>
     </section>
   );

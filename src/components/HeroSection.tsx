@@ -25,21 +25,21 @@ export function HeroSection() {
       {/* ══ HERO: さくら湯が背景、文字がその上に ══ */}
       <div className="relative flex min-h-[90vh] items-center overflow-hidden">
 
-        {/* レイヤー1: さくら湯イラスト — 全面背景 */}
+        {/* レイヤー1: チブサンイラスト — 全面背景 */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="/images/さくら湯.svg"
+          src="/images/チブサン.svg"
           alt=""
           className="absolute inset-0 h-full w-full"
           style={{ objectFit: "cover", objectPosition: "center" }}
         />
 
-        {/* レイヤー2: 左から右へのグラデーションオーバーレイ（文字可読性確保） */}
+        {/* レイヤー2: オーバーレイ（チブサンのピンク系） */}
         <div
           className="absolute inset-0"
           style={{
             background:
-              "linear-gradient(105deg, rgba(20,45,30,0.96) 0%, rgba(20,45,30,0.88) 35%, rgba(20,45,30,0.55) 60%, rgba(20,45,30,0.15) 100%)",
+              "linear-gradient(105deg, rgba(60,10,35,0.92) 0%, rgba(60,10,35,0.82) 40%, rgba(60,10,35,0.50) 70%, rgba(60,10,35,0.20) 100%)",
           }}
         />
 
@@ -77,10 +77,6 @@ export function HeroSection() {
           </div>
         </div>
 
-        {/* レイヤー3: 右下に不動岩 — 浮かせて配置 */}
-        <div className="absolute bottom-0 right-0 z-10 w-[45%] max-w-md opacity-80 drop-shadow-2xl md:block hidden">
-          <IllustImg name="不動岩" alt="" className="w-full h-auto" />
-        </div>
       </div>
 
       {/* ══ ピンク帯マーキー ══ */}

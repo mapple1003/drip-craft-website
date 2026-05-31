@@ -32,18 +32,18 @@ export function StorySection() {
 
       {/* ── チブサンを背景に大見出しを重ねる ── */}
       <div className="relative min-h-[50vh] overflow-hidden flex items-center">
-        {/* レイヤー1: チブサンイラスト — 全面背景 */}
+        {/* レイヤー1: さくら湯イラスト — 全面背景 */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="/images/チブサン.svg"
+          src="/images/さくら湯.svg"
           alt=""
           className="absolute inset-0 h-full w-full"
-          style={{ objectFit: "cover", objectPosition: "center top" }}
+          style={{ objectFit: "cover", objectPosition: "center" }}
         />
-        {/* レイヤー2: チブサンのピンク系カラーのオーバーレイ */}
+        {/* レイヤー2: さくら湯の青・紺系オーバーレイ */}
         <div
           className="absolute inset-0"
-          style={{ background: "linear-gradient(135deg, rgba(160,60,90,0.92) 0%, rgba(105,30,80,0.85) 50%, rgba(80,20,60,0.75) 100%)" }}
+          style={{ background: "linear-gradient(135deg, rgba(15,30,55,0.92) 0%, rgba(20,45,70,0.85) 50%, rgba(10,25,45,0.78) 100%)" }}
         />
         {/* レイヤー3: 大見出し — イラストの上に */}
         <div className="relative z-10 mx-auto w-full max-w-6xl px-8 py-16 text-white">
