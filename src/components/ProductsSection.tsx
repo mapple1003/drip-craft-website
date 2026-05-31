@@ -21,15 +21,14 @@ function ProductImage({ src, alt }: { src?: string; alt: string }) {
           fill
           className="object-cover transition-transform duration-300 group-hover:scale-105"
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+          quality={90}
         />
       </div>
     );
   }
   return (
-    <div className="flex h-48 items-center justify-center bg-gradient-to-br from-amber-100 to-orange-200">
-      <div className="flex h-20 w-20 items-center justify-center rounded-full bg-white/60 shadow-sm backdrop-blur-sm">
-        <Coffee size={36} className="text-stone-600" />
-      </div>
+    <div className="flex h-48 items-center justify-center" style={{ background: "var(--pop-cream)" }}>
+      <Coffee size={36} className="text-muted-foreground/40" />
     </div>
   );
 }
@@ -44,48 +43,38 @@ export function ProductsSection() {
       .finally(() => setLoading(false));
   }, []);
 
-  const singles = products.slice(0, -1).concat(
-    products.length > 0 ? [] : []
-  );
-  // Show all active products as individual cards, then check if there's a set in Firestore
-  // For now show all products as individual cards
-
   return (
-    <section id="products" className="relative overflow-hidden px-6 py-24" style={{ background: "var(--pop-cream)" }}>
-      {/* Decorative corner illustration (chibusankofun red pattern) */}
-      <div className="pointer-events-none absolute right-0 top-0 h-40 w-40 -translate-y-1/4 translate-x-1/4 overflow-hidden rounded-full opacity-10">
+    <section id="products" className="pb-24">
+      {/* 不動岩 landscape — full-width section header banner */}
+      <div className="relative h-56 w-full overflow-hidden md:h-72">
         <Image
-          src="/images/チブサン_宇宙人.png"
-          alt=""
+          src="/images/不動岩.png"
+          alt="不動岩"
           fill
-          className="object-cover"
-          sizes="160px"
+          className="object-cover object-center"
+          quality={95}
+          sizes="100vw"
         />
-      </div>
-      <div className="mx-auto max-w-6xl">
-        <div className="mb-16 text-center">
-          <p
-            className="mb-3 text-sm font-bold tracking-widest"
-            style={{ color: "var(--pop-rose)" }}
-          >
-            ✦ LINEUP ✦
-          </p>
-          <h2 className="mb-1 text-3xl font-bold text-foreground md:text-4xl">
-            商品ラインナップ
-          </h2>
-          <p className="mb-4 text-sm tracking-wide text-muted-foreground">Product Lineup</p>
-          <p className="mx-auto max-w-md text-muted-foreground">
-            地域の名所や自然からインスパイアされた、
-            EKIREIオリジナルのドリップバッグコーヒーです。
-          </p>
+        {/* Dark overlay for text readability */}
+        <div
+          className="absolute inset-0"
+          style={{ background: "linear-gradient(to bottom, rgba(0,0,0,0.15), rgba(0,0,0,0.55))" }}
+        />
+        <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 text-white">
+          <p className="text-xs font-bold tracking-[0.3em] opacity-90">✦ LINEUP ✦</p>
+          <h2 className="text-3xl font-bold drop-shadow md:text-4xl">商品ラインナップ</h2>
+          <p className="text-sm opacity-80">地域の名所からインスパイアされたEKIREIオリジナルコーヒー</p>
         </div>
+      </div>
 
+      {/* Products grid */}
+      <div className="mx-auto max-w-6xl px-6 pt-16">
         {loading ? (
           <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
             {[1, 2, 3, 4].map((i) => (
               <Card key={i} className="overflow-hidden">
                 <Skeleton className="h-48 w-full rounded-none" />
-                <div className="p-4 flex flex-col gap-2">
+                <div className="flex flex-col gap-2 p-4">
                   <Skeleton className="h-5 w-3/4" />
                   <Skeleton className="h-4 w-full" />
                   <Skeleton className="h-4 w-2/3" />

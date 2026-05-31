@@ -6,7 +6,6 @@ import { Separator } from "@/components/ui/separator";
 import { Instagram } from "lucide-react";
 import { getSiteContent } from "@/lib/firestore";
 import type { SiteContentSettings } from "@/types/admin";
-import { IllustParade } from "@/components/IllustParade";
 
 export function SiteFooter() {
   const [handle, setHandle] = useState("ekirei_219");
@@ -18,11 +17,19 @@ export function SiteFooter() {
   }, []);
 
   return (
-    <footer className="border-t bg-card">
-      {/* Illustration parade strip */}
-      <IllustParade variant="footer" />
+    <footer className="relative overflow-hidden border-t bg-card">
+      {/* アイラトビカズラ — subtle background decoration */}
+      <div className="pointer-events-none absolute right-0 top-0 h-full w-64 opacity-[0.07] md:w-80">
+        <Image
+          src="/images/アイラトビカズラ.png"
+          alt=""
+          fill
+          className="object-cover object-left"
+          sizes="320px"
+        />
+      </div>
 
-      <div className="px-6 py-12">
+      <div className="relative px-6 py-12">
         <div className="mx-auto max-w-6xl">
           <div className="mb-8 flex flex-col items-center gap-4 text-center">
             {/* Logo */}
@@ -41,15 +48,11 @@ export function SiteFooter() {
               厳選したスペシャルティコーヒーを、毎日の一杯に。
             </p>
 
-            {/* Colorful dots decoration */}
+            {/* Colorful dot accent */}
             <div className="flex items-center gap-2">
-              {["var(--brand-green)", "var(--pop-rose)", "var(--pop-ochre)", "var(--brand-purple)"].map(
+              {(["var(--brand-green)", "var(--pop-rose)", "var(--pop-ochre)", "var(--brand-purple)"] as const).map(
                 (color, i) => (
-                  <div
-                    key={i}
-                    className="h-2 w-2 rounded-full"
-                    style={{ background: color }}
-                  />
+                  <div key={i} className="h-2 w-2 rounded-full" style={{ background: color }} />
                 )
               )}
             </div>
@@ -70,15 +73,9 @@ export function SiteFooter() {
 
           <div className="flex flex-col items-center gap-2 text-center text-xs text-muted-foreground">
             <nav className="flex gap-6">
-              <a href="#products" className="transition-colors hover:text-foreground">
-                商品
-              </a>
-              <a href="#story" className="transition-colors hover:text-foreground">
-                ブランドについて
-              </a>
-              <a href="#contact" className="transition-colors hover:text-foreground">
-                お問い合わせ
-              </a>
+              <a href="#products" className="transition-colors hover:text-foreground">商品</a>
+              <a href="#story" className="transition-colors hover:text-foreground">ブランドについて</a>
+              <a href="#contact" className="transition-colors hover:text-foreground">お問い合わせ</a>
             </nav>
             <p className="mt-2">© 2025 EKIREI. All rights reserved.</p>
           </div>

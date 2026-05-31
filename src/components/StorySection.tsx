@@ -34,11 +34,14 @@ export function StorySection() {
   const values = story.values?.length ? story.values : DEFAULT_VALUES;
 
   return (
-    <section id="story" className="px-6 py-24">
+    <section id="story" className="overflow-hidden px-6 py-24">
       <div className="mx-auto max-w-6xl">
         <div className="grid gap-16 md:grid-cols-2 md:items-center">
+          {/* Text column */}
           <div>
-            <p className="mb-3 text-sm font-bold tracking-widest" style={{ color: "var(--brand-green)" }}>✦ OUR STORY ✦</p>
+            <p className="mb-3 text-sm font-bold tracking-widest" style={{ color: "var(--brand-green)" }}>
+              ✦ OUR STORY ✦
+            </p>
             <h2 className="mb-1 text-3xl font-bold leading-snug text-foreground md:text-4xl">
               {story.heading.split("\n").map((line, i) => (
                 <span key={i}>{i > 0 && <br />}{line}</span>
@@ -53,7 +56,10 @@ export function StorySection() {
                 const Icon = ICONS[i] ?? Leaf;
                 return (
                   <div key={i} className="flex gap-4">
-                    <div className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl" style={{ background: "oklch(0.60 0.09 162 / 0.12)" }}>
+                    <div
+                      className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl"
+                      style={{ background: "oklch(0.60 0.09 162 / 0.12)" }}
+                    >
                       <Icon size={18} className="text-primary" />
                     </div>
                     <div>
@@ -66,8 +72,8 @@ export function StorySection() {
             </div>
           </div>
 
-          {/* Right panel: illustration collage */}
-          <div className="relative flex items-center justify-center">
+          {/* Right panel: illustration */}
+          <div className="relative">
             {story.imageUrl ? (
               <div className="overflow-hidden rounded-3xl shadow-lg">
                 <div className="relative aspect-square w-full">
@@ -77,51 +83,28 @@ export function StorySection() {
                     fill
                     className="object-cover"
                     sizes="(max-width: 768px) 90vw, 500px"
+                    quality={90}
                   />
                 </div>
               </div>
             ) : (
-              /* Illustration collage: bear + saruta side by side */
-              <div className="relative h-80 w-full max-w-md md:h-96">
-                {/* Saruta — large, left, slightly rotated */}
-                <div className="absolute bottom-0 left-4 w-48 -rotate-3 overflow-hidden rounded-2xl shadow-lg md:w-56">
-                  <div className="relative aspect-[3/4] w-full">
-                    <Image
-                      src="/images/猿田彦.png"
-                      alt="猿田彦"
-                      fill
-                      className="object-cover"
-                      sizes="224px"
-                    />
-                  </div>
-                </div>
-                {/* Stone figure — right, overlapping slightly */}
-                <div className="absolute right-4 top-4 w-44 rotate-2 overflow-hidden rounded-2xl shadow-lg md:w-52">
-                  <div className="relative aspect-square w-full">
-                    <Image
-                      src="/images/石人2.png"
-                      alt="石人"
-                      fill
-                      className="object-cover"
-                      sizes="208px"
-                    />
-                  </div>
-                </div>
-                {/* Decorative dots */}
-                <div
-                  className="pointer-events-none absolute inset-0 -z-10 opacity-20"
-                  style={{
-                    backgroundImage:
-                      "radial-gradient(circle, var(--pop-rose) 1.5px, transparent 1.5px)",
-                    backgroundSize: "20px 20px",
-                  }}
+              /* チブサン illustration — full quality, no crop */
+              <div className="relative overflow-hidden rounded-3xl shadow-xl">
+                <Image
+                  src="/images/チブサン.png"
+                  alt="チブサン"
+                  width={520}
+                  height={520}
+                  className="w-full h-auto object-contain"
+                  sizes="(max-width: 768px) 90vw, 520px"
+                  quality={95}
                 />
-                {/* Coffee accent text */}
+                {/* Caption badge */}
                 <div
-                  className="absolute -top-4 left-1/2 -translate-x-1/2 rounded-full px-4 py-1.5 text-xs font-bold tracking-widest text-white shadow-md"
-                  style={{ background: "var(--pop-ochre)" }}
+                  className="absolute bottom-4 left-1/2 -translate-x-1/2 rounded-full px-5 py-2 text-sm font-bold text-white shadow-lg"
+                  style={{ background: "var(--brand-purple)" }}
                 >
-                  ✦ STORY ✦
+                  ✦ チブサン ✦
                 </div>
               </div>
             )}
