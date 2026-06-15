@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { AdminGuard } from "@/components/admin/AdminGuard";
 import { AdminNav } from "@/components/admin/AdminNav";
 import { getSiteContent, setSiteContent } from "@/lib/firestore";
-import type { SiteContentHero, SiteContentStory, SiteContentContact, SiteContentSettings, StoryValue } from "@/types/admin";
+import type { SiteContentHero, SiteContentStory, SiteContentContact, SiteContentSettings, StoryValue, SiteContentCharacters } from "@/types/admin";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -29,6 +29,8 @@ export default function ContentPage() {
   const [heroImageProgress, setHeroImageProgress] = useState(0);
   const [uploadingStoryImage, setUploadingStoryImage] = useState(false);
   const [storyImageProgress, setStoryImageProgress] = useState(0);
+  const [characters, setCharacters] = useState<SiteContentCharacters | null>(null);
+  const [savingCharacters, setSavingCharacters] = useState(false);
 
   useEffect(() => {
     getSiteContent<SiteContentHero>("hero").then((data) => {
@@ -64,6 +66,14 @@ export default function ContentPage() {
         updatedAt: new Date(),
       });
     });
+    getSiteContent<SiteContentCharacters>("characters").then((data) => {
+      setCharacters(data ?? {
+        ishijin: { name: "石人", description: "チブサン古墳に描かれた石人。古代の人々の祈りと文化を今に伝える、山鹿が誇る装飾古墳のシンボル的存在です。" },
+        chibusan: { name: "チブサン古墳 壁画", description: "山鹿市にある国指定史跡・チブサン古墳の装飾壁画。その謎めいた文様は「宇宙人」とも呼ばれ、古代ロマンを感じさせます。" },
+        saruta: { name: "猿田彦大神", description: "道案内の神・猿田彦大神。旅人を正しい道へと導くとされる守護神で、山鹿の神社で今も人々に親しまれています。" },
+        updatedAt: new Date(),
+      });
+    });
   }, []);
 
   const saveHero = async () => {
@@ -80,6 +90,23 @@ export default function ContentPage() {
       toast.error("保存に失敗しました");
     } finally {
       setSavingHero(false);
+    }
+  };
+
+  const saveCharacters = async () => {
+    if (!characters) return;
+    setSavingCharacters(true);
+    try {
+      await setSiteContent("characters", {
+        ishijin: characters.ishijin,
+        chibusan: characters.chibusan,
+        saruta: characters.saruta,
+      });
+      toast.success("キャラクター説明を保存しました");
+    } catch {
+      toast.error("保存に失敗しました");
+    } finally {
+      setSavingCharacters(false);
     }
   };
 
@@ -507,6 +534,61 @@ export default function ContentPage() {
                 </div>
                 <Button onClick={saveContact} disabled={savingContact} className="w-fit">
                   {savingContact ? <><Loader2 size={16} className="animate-spin mr-2" />保存中...</> : "保存する"}
+                </Button>
+              </CardContent>
+            </Card>
+
+            {/* ── キャラクター説明 ── */}
+            <Card>
+              <CardHeader>
+                <CardTitle>飛び回るキャラクター 説明文</CardTitle>
+                <p className="text-sm text-muted-foreground">
+                  ダブルクリックで表示されるポップアップの名前・説明文を編集できます。
+                </p>
+              </CardHeader>
+              <CardContent className="flex flex-col gap-8">
+                {(
+                  [
+                    { key: "ishijin" as const, label: "🪨 石人", img: "/images/石人2.png" },
+                    { key: "chibusan" as const, label: "👽 チブサン宇宙人", img: "/images/チブサン_宇宙人.png" },
+                    { key: "saruta" as const, label: "🌿 猿田彦", img: "/images/猿田彦.png" },
+                  ] as const
+                ).map(({ key, label, img }) => (
+                  <div key={key} className="flex flex-col gap-3 rounded-xl border p-4">
+                    <div className="flex items-center gap-3">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={img} alt={label} className="h-12 w-12 object-contain" />
+                      <p className="font-semibold text-foreground">{label}</p>
+                    </div>
+                    <div className="flex flex-col gap-1.5">
+                      <Label>名前</Label>
+                      <Input
+                        value={characters?.[key]?.name ?? ""}
+                        onChange={(e) =>
+                          setCharacters((c) =>
+                            c ? { ...c, [key]: { ...c[key], name: e.target.value } } : null
+                          )
+                        }
+                        placeholder="例：石人"
+                      />
+                    </div>
+                    <div className="flex flex-col gap-1.5">
+                      <Label>説明文</Label>
+                      <Textarea
+                        rows={3}
+                        value={characters?.[key]?.description ?? ""}
+                        onChange={(e) =>
+                          setCharacters((c) =>
+                            c ? { ...c, [key]: { ...c[key], description: e.target.value } } : null
+                          )
+                        }
+                        placeholder="キャラクターの説明を入力してください"
+                      />
+                    </div>
+                  </div>
+                ))}
+                <Button onClick={saveCharacters} disabled={savingCharacters} className="w-fit">
+                  {savingCharacters ? <><Loader2 size={16} className="animate-spin mr-2" />保存中...</> : "保存する"}
                 </Button>
               </CardContent>
             </Card>

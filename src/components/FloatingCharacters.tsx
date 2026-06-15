@@ -2,36 +2,47 @@
 
 import Image from "next/image";
 import { useEffect, useRef, useState, useCallback } from "react";
+import { getSiteContent } from "@/lib/firestore";
+import type { SiteContentCharacters } from "@/types/admin";
 
+// Static config (image, size) — text content comes from Firestore
 const CHARS_DEF = [
   {
-    id: "ishijin",
+    id: "ishijin" as const,
     src: "/images/石人2.png",
     alt: "石人",
     size: 80,
-    name: "石人",
-    description:
-      "チブサン古墳に描かれた石人。古代の人々の祈りと文化を今に伝える、山鹿が誇る装飾古墳のシンボル的存在です。",
   },
   {
-    id: "chibusan",
+    id: "chibusan" as const,
     src: "/images/チブサン_宇宙人.png",
     alt: "チブサン宇宙人",
     size: 72,
-    name: "チブサン古墳 壁画",
-    description:
-      "山鹿市にある国指定史跡・チブサン古墳の装飾壁画。その謎めいた文様は「宇宙人」とも呼ばれ、古代ロマンを感じさせます。",
   },
   {
-    id: "saruta",
+    id: "saruta" as const,
     src: "/images/猿田彦.png",
     alt: "猿田彦",
     size: 88,
-    name: "猿田彦大神",
-    description:
-      "道案内の神・猿田彦大神。旅人を正しい道へと導くとされる守護神で、山鹿の神社で今も人々に親しまれています。",
   },
 ];
+
+// Default descriptions used until Firestore loads
+const DEFAULT_CHARS: SiteContentCharacters = {
+  ishijin: {
+    name: "石人",
+    description: "チブサン古墳に描かれた石人。古代の人々の祈りと文化を今に伝える、山鹿が誇る装飾古墳のシンボル的存在です。",
+  },
+  chibusan: {
+    name: "チブサン古墳 壁画",
+    description: "山鹿市にある国指定史跡・チブサン古墳の装飾壁画。その謎めいた文様は「宇宙人」とも呼ばれ、古代ロマンを感じさせます。",
+  },
+  saruta: {
+    name: "猿田彦大神",
+    description: "道案内の神・猿田彦大神。旅人を正しい道へと導くとされる守護神で、山鹿の神社で今も人々に親しまれています。",
+  },
+  updatedAt: new Date(),
+};
 
 interface CharState {
   x: number;
@@ -57,6 +68,14 @@ export function FloatingCharacters() {
   const initialized = useRef(false);
   const clickTimers = useRef<(ReturnType<typeof setTimeout> | null)[]>([null, null, null]);
   const [popup, setPopup] = useState<PopupInfo | null>(null);
+  const [chars, setChars] = useState<SiteContentCharacters>(DEFAULT_CHARS);
+
+  // Load character descriptions from Firestore
+  useEffect(() => {
+    getSiteContent<SiteContentCharacters>("characters").then((data) => {
+      if (data) setChars(data);
+    });
+  }, []);
 
   useEffect(() => {
     if (initialized.current) return;
@@ -153,7 +172,7 @@ export function FloatingCharacters() {
             className="absolute cursor-pointer select-none transition-none"
             style={{ left: 0, top: 0, width: char.size, height: char.size, pointerEvents: "auto" }}
             onClick={() => handleClick(i)}
-            title={`クリック: スピードアップ｜ダブルクリック: ${char.name}について`}
+            title={`クリック: スピードアップ｜ダブルクリック: ${char.alt}について`}
           >
             <Image
               src={char.src}
@@ -166,39 +185,30 @@ export function FloatingCharacters() {
         ))}
       </div>
 
-      {/* Info popup (double click) */}
+      {/* Info popup (double click) — uses Firestore content */}
       {popup !== null && (() => {
-        const char = CHARS_DEF[popup.index];
+        const charDef = CHARS_DEF[popup.index];
+        const charContent = chars[charDef.id];
         const popupW = 280;
-        const px = Math.min(popup.x + char.size + 8, window.innerWidth - popupW - 12);
+        const px = Math.min(popup.x + charDef.size + 8, window.innerWidth - popupW - 12);
         const py = Math.max(popup.y, 80);
         return (
           <div
             className="fixed z-50 w-[280px] rounded-2xl border border-border bg-card p-5 shadow-2xl animate-in fade-in zoom-in-95 duration-150"
             style={{ left: px, top: py }}
           >
-            {/* Close */}
             <button
               onClick={() => setPopup(null)}
               className="absolute right-3 top-3 flex h-6 w-6 items-center justify-center rounded-full text-muted-foreground hover:bg-muted hover:text-foreground text-sm leading-none"
             >
               ✕
             </button>
-
-            {/* Character image + name */}
             <div className="mb-3 flex items-center gap-3">
-              <Image
-                src={char.src}
-                alt={char.name}
-                width={52}
-                height={52}
-                className="shrink-0 object-contain"
-              />
-              <h3 className="font-bold text-foreground leading-tight">{char.name}</h3>
+              <Image src={charDef.src} alt={charContent.name} width={52} height={52}
+                className="shrink-0 object-contain" />
+              <h3 className="font-bold text-foreground leading-tight">{charContent.name}</h3>
             </div>
-
-            {/* Description */}
-            <p className="text-sm leading-relaxed text-muted-foreground">{char.description}</p>
+            <p className="text-sm leading-relaxed text-muted-foreground">{charContent.description}</p>
           </div>
         );
       })()}

@@ -67,7 +67,7 @@ export async function deleteProduct(id: string): Promise<void> {
 
 // --- Site Content ---
 
-export async function getSiteContent<T>(section: "hero" | "story" | "contact" | "settings"): Promise<T | null> {
+export async function getSiteContent<T>(section: "hero" | "story" | "contact" | "settings" | "characters"): Promise<T | null> {
   const snap = await getDoc(doc(db, "siteContent", section));
   if (!snap.exists()) return null;
   const data = snap.data();
@@ -78,7 +78,7 @@ export async function getSiteContent<T>(section: "hero" | "story" | "contact" | 
 }
 
 export async function setSiteContent(
-  section: "hero" | "story" | "contact" | "settings",
+  section: "hero" | "story" | "contact" | "settings" | "characters",
   data: Record<string, unknown>
 ): Promise<void> {
   await setDoc(
