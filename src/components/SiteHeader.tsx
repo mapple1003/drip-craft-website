@@ -4,7 +4,9 @@ import { useState } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Menu } from "lucide-react";
+import { Menu, ShoppingBag } from "lucide-react";
+
+const SHOP_URL = "https://ekirei219.base.shop/";
 
 const navLinks = [
   { label: "商品", href: "#products" },
@@ -57,12 +59,20 @@ export function SiteHeader() {
               {link.label}
             </button>
           ))}
-          <Button
-            size="sm"
-            onClick={() => handleNav("#products")}
+          <a
+            href={SHOP_URL}
+            target="_blank"
+            rel="noopener noreferrer"
           >
-            購入する
-          </Button>
+            <Button
+              size="sm"
+              className="gap-1.5 font-bold text-white shadow-sm"
+              style={{ background: "var(--pop-rose)" }}
+            >
+              <ShoppingBag size={14} />
+              ONLINE SHOP
+            </Button>
+          </a>
         </nav>
 
         {/* Mobile nav */}
@@ -83,9 +93,15 @@ export function SiteHeader() {
                   {link.label}
                 </button>
               ))}
-              <Button onClick={() => handleNav("#products")} className="mt-4">
-                購入する
-              </Button>
+              <a href={SHOP_URL} target="_blank" rel="noopener noreferrer" className="mt-4">
+                <Button
+                  className="w-full gap-2 font-bold text-white"
+                  style={{ background: "var(--pop-rose)" }}
+                >
+                  <ShoppingBag size={16} />
+                  ONLINE SHOP
+                </Button>
+              </a>
             </nav>
           </SheetContent>
         </Sheet>
