@@ -52,6 +52,18 @@ export type SiteContentContact = {
   updatedAt: Date;
 };
 
+export type CharacterInfo = {
+  name: string;
+  description: string;
+};
+
+export type SiteContentCharacters = {
+  ishijin: CharacterInfo;
+  chibusan: CharacterInfo;
+  saruta: CharacterInfo;
+  updatedAt: Date;
+};
+
 export type StoreDoc = {
   id: string;
   name: string;
