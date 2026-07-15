@@ -99,6 +99,8 @@ export type SpotDoc = {
   locations?: SpotLocation[];
   lat?: number;
   lng?: number;
+  linkUrl?: string;
+  linkLabel?: string;
   isIntro?: boolean;
   active: boolean;
   order: number;

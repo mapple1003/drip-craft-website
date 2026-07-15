@@ -21,6 +21,8 @@ import { Loader2, Sparkles, Plus, Trash2, Upload, MapPin, X } from "lucide-react
 const spotSchema = z.object({
   name: z.string().min(1, "入力してください"),
   description: z.string().min(1, "入力してください"),
+  linkUrl: z.string().optional(),
+  linkLabel: z.string().optional(),
   nameEn: z.string().optional(),
   descriptionEn: z.string().optional(),
   nameZh: z.string().optional(),
@@ -108,6 +110,8 @@ export function SpotForm({ spot }: { spot?: SpotDoc }) {
       descriptionZh: spot?.descriptionZh ?? "",
       nameKo: spot?.nameKo ?? "",
       descriptionKo: spot?.descriptionKo ?? "",
+      linkUrl: spot?.linkUrl ?? "",
+      linkLabel: spot?.linkLabel ?? "",
       order: String(spot?.order ?? 0),
       active: spot?.active ?? true,
       isIntro: spot?.isIntro ?? false,
@@ -156,6 +160,8 @@ export function SpotForm({ spot }: { spot?: SpotDoc }) {
       const payload = {
         name: data.name,
         description: data.description,
+        linkUrl: data.linkUrl ?? "",
+        linkLabel: data.linkLabel ?? "",
         nameEn: data.nameEn ?? "",
         descriptionEn: data.descriptionEn ?? "",
         nameZh: data.nameZh ?? "",
@@ -209,6 +215,25 @@ export function SpotForm({ spot }: { spot?: SpotDoc }) {
                 <FormMessage />
               </FormItem>
             )} />
+
+            {/* Link */}
+            <div className="rounded-xl border border-border bg-muted/30 p-4 flex flex-col gap-3">
+              <p className="text-sm font-medium text-foreground">🔗 関連リンク（任意）</p>
+              <FormField control={form.control} name="linkUrl" render={({ field }) => (
+                <FormItem>
+                  <FormLabel>URL</FormLabel>
+                  <FormControl><Input type="url" placeholder="https://example.com" {...field} /></FormControl>
+                  <FormMessage />
+                </FormItem>
+              )} />
+              <FormField control={form.control} name="linkLabel" render={({ field }) => (
+                <FormItem>
+                  <FormLabel>リンクのテキスト（省略時はURLを表示）</FormLabel>
+                  <FormControl><Input placeholder="例：公式サイトはこちら" {...field} /></FormControl>
+                  <FormMessage />
+                </FormItem>
+              )} />
+            </div>
 
             <Separator />
 

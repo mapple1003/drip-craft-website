@@ -375,6 +375,18 @@ export default function SpotPage() {
             {content.description}
           </p>
 
+          {/* External link */}
+          {spot.linkUrl && (
+            <a
+              href={spot.linkUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-4 inline-flex items-center gap-1.5 rounded-full border border-primary/40 bg-primary/5 px-4 py-2 text-sm font-medium text-primary hover:bg-primary/10 transition-colors"
+            >
+              🔗 {spot.linkLabel || spot.linkUrl}
+            </a>
+          )}
+
           {/* Audio guide button */}
           {audioState !== "unsupported" && (
             <button
