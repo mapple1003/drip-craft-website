@@ -110,16 +110,22 @@ function CollectionContent() {
     return sum;
   }, 0);
 
-  const mapSpots = spots
-    .filter((s) => s.lat && s.lng)
-    .map((s) => ({
-      id: s.id,
-      name: s.name,
-      lat: s.lat!,
-      lng: s.lng!,
-      scanned: s.status.scanned,
-      visited: s.status.visited,
-    }));
+  const mapSpots = spots.flatMap((s) => {
+    if (s.locations?.length) {
+      return s.locations.map((loc, i) => ({
+        id: `${s.id}_${i}`,
+        name: i === 0 ? s.name : `${s.name}（${loc.name || `場所${i + 1}`}）`,
+        lat: loc.lat,
+        lng: loc.lng,
+        scanned: s.status.scanned,
+        visited: s.status.visited,
+      }));
+    }
+    if (s.lat && s.lng) {
+      return [{ id: s.id, name: s.name, lat: s.lat, lng: s.lng, scanned: s.status.scanned, visited: s.status.visited }];
+    }
+    return [];
+  });
 
   const mapCenter =
     mapSpots.length > 0
